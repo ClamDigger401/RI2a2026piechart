@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rhode Island 2026 — Firearms Legislation</title>
+  <meta name="description" content="Interactive breakdown of all 7 confirmed firearms bills introduced in the Rhode Island 2026 legislative session." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0d1520;
+      color: #e8edf2;
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      padding: 40px 20px 80px;
+    }
+    a { text-decoration: none; }
+    .wrap { max-width: 820px; margin: 0 auto; }
+
+    /* Header */
+    .eyebrow {
+      text-align: center;
+      font-size: 10px;
+      letter-spacing: 4px;
+      color: #c0392b;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(22px, 5vw, 36px);
+      font-weight: 700;
+      text-align: center;
+      color: #e8edf2;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #566778;
+      font-size: 12.5px;
+      margin-bottom: 40px;
+    }
+
+    /* Pie row */
+    .pie-row {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
+    }
+    #pie-svg { overflow: visible; display: block; cursor: pointer; }
+
+    /* Legend */
+    .legend { display: flex; flex-direction: column; gap: 10px; min-width: 200px; }
+    .legend-item {
+      display: flex; align-items: center; gap: 12px;
+      cursor: pointer; padding: 10px 14px; border-radius: 8px;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .legend-dot { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+    .legend-label { font-size: 13px; color: #a0b8cc; font-weight: 500; transition: color 0.2s; }
+    .legend-sub { font-size: 11px; color: #566778; }
+    .legend-count { font-size: 20px; font-weight: 700; }
+
+    /* Filter badge */
+    #filter-badge {
+      text-align: center;
+      margin-bottom: 18px;
+      min-height: 28px;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 12px;
+      padding: 4px 14px;
+      border-radius: 20px;
+      border: 1px solid;
+    }
+    .badge .clear { cursor: pointer; text-decoration: underline; }
+
+    /* Bill cards */
+    #bill-list { display: flex; flex-direction: column; gap: 10px; }
+    .bill-card {
+      border-radius: 10px;
+      padding: 14px 16px;
+      transition: all 0.25s ease;
+      border-left-width: 3px;
+      border-left-style: solid;
+      border-top: 1px solid;
+      border-right: 1px solid;
+      border-bottom: 1px solid;
+    }
+    .bill-card.dimmed { opacity: 0.35; }
+    .card-top {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 10px; margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+    .card-tags { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .tag {
+      font-family: monospace; font-weight: 800; font-size: 13px;
+      padding: 2px 8px; border-radius: 5px; letter-spacing: 0.5px;
+    }
+    .tag-sm {
+      font-size: 10px; padding: 2px 7px; border-radius: 4px;
+      letter-spacing: 1px; text-transform: uppercase;
+    }
+    .card-links { display: flex; gap: 8px; flex-shrink: 0; }
+    .btn-link {
+      font-size: 10px; padding: 3px 8px; border-radius: 4px;
+      letter-spacing: 0.5px; font-weight: 600; white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+    .btn-link:hover { opacity: 0.75; }
+    .btn-legiscan { color: #4a9fd4; background: #4a9fd420; }
+    .btn-pdf { color: #a0b0c0; background: #1a2d3e; }
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 14px; color: #d8e8f2; margin-bottom: 6px; line-height: 1.4;
+    }
+    .card-desc { font-size: 12px; color: #8fa8bc; line-height: 1.6; margin-bottom: 8px; }
+    .card-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+    .card-meta span { font-size: 11px; color: #566778; }
+    .card-meta em { color: rgba(74,159,212,0.4); font-style: normal; }
+
+    /* Footer note */
+    .note {
+      margin-top: 32px; padding: 14px 18px;
+      background: #121e2b; border-radius: 8px;
+      border-left: 3px solid #1e3a55;
+      font-size: 11.5px; color: #4a6070; line-height: 1.7;
+    }
+    .note strong { color: #4a9fd4; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Rhode Island · 2026 Session</div>
+  <h1>Firearms Legislation</h1>
+  <p class="subtitle">7 confirmed bills · January–March 2026 · All links go to official RI Legislature or LegiScan records</p>
+
+  <div class="pie-row">
+    <svg id="pie-svg" width="220" height="220" viewBox="0 0 220 220"></svg>
+
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div id="filter-badge"></div>
+  <div id="bill-list"></div>
+
+  <div class="note">
+    <strong>Sources &amp; Methodology: </strong>
+    Bills confirmed via LegiScan and the RI Legislature's official webserver (webserver.rilegislature.gov/BillText26/).
+    H8073 and S2726 confirmed introduced Feb 27, 2026. S2153 confirmed Jan 16, 2026. S2971 confirmed Mar 4, 2026.
+    PDF links point directly to official RI Legislature bill text. Session ongoing — additional bills may be introduced.
+    Hover or tap the pie chart or legend to filter by type.
+  </div>
+
+</div>
+
+<script>
+const BILLS = [
+  {
+    num: "H8073", chamber: "House", type: "restriction",
+    title: "Possession of Prohibited Firearms Ban",
+    desc: "Expands 2025 assault weapons sales ban to also prohibit POSSESSION of prohibited firearms. Violators face up to 10 years and/or $10,000 fine. Effective July 1, 2026.",
+    status: "In House Judiciary Committee", introduced: "Feb 27, 2026",
+    legiscanUrl: "https://legiscan.com/RI/bill/H8073/2026",
+    pdfUrl: "https://webserver.rilegislature.gov/BillText26/HouseText26/H8073.pdf",
+    sponsor: "Democrat (9 co-sponsors)",
+  },
+  {
+    num: "H7755", chamber: "House", type: "restriction",
+    title: "Responsible Firearm Purchasing Act — Expansion",
+    desc: "Expands existing handgun training certificate requirement to cover all rifles and shotguns. Adds 7-day waiting period for long guns. New purchasers must provide valid certificate from AG.",
+    status: "In House Judiciary Committee", introduced: "Jan 2026",
+    legiscanUrl: "https://legiscan.com/RI/bill/H7755/2026",
+    pdfUrl: "https://webserver.rilegislature.gov/BillText26/HouseText26/H7755.pdf",
+    sponsor: "Democrat",
+  },
+  {
+    num: "S2726", chamber: "Senate", type: "restriction",
+    title: "Responsible Firearm Purchasing Act (Senate)",
+    desc: "Senate companion to H7755. Requires all persons seeking to possess a firearm — except police and military — to complete and pass a basic firearm safety training course.",
+    status: "In Senate Judiciary Committee", introduced: "Feb 27, 2026",
+    legiscanUrl: "https://legiscan.com/RI/bill/S2726/2026",
+    pdfUrl: "https://webserver.rilegislature.gov/BillText26/SenateText26/S2726.pdf",
+    sponsor: "Democrat (8 co-sponsors)",
+  },
+  {
+    num: "S2611", chamber: "Senate", type: "restriction",
+    title: "Firearm Industry Accountability Act",
+    desc: "Establishes the Rhode Island Firearm Industry Accountability Act of 2026. Creates civil liability framework for manufacturers and dealers who fail to implement reasonable controls against illegal sales.",
+    status: "In Senate Judiciary Committee", introduced: "Feb 13, 2026",
+    legiscanUrl: "https://legiscan.com/RI/bill/S2611/2026",
+    pdfUrl: "https://webserver.rilegislature.gov/BillText26/SenateText26/S2611.pdf",
+    sponsor: "Democrat",
+  },
+  {
+    num: "H7650", chamber: "House", type: "mixed",
+    title: "Stun Gun Carry Permit & Transfer Penalties",
+    desc: "Permits persons 18+ with a license or permit to carry a stun gun. Imposes criminal penalties for unlawful sale or transfer of stun guns to minors or prohibited persons.",
+    status: "In House Judiciary Committee", introduced: "Jan 2026",
+    legiscanUrl: "https://legiscan.com/RI/bill/H7650/2026",
+    pdfUrl: "https://webserver.rilegislature.gov/BillText26/HouseText26/H7650.pdf",
+    sponsor: "Democrat",
+  },
+  {
+    num: "S2153", chamber: "Senate", type: "expansion",
+    title: "Concealed Carry Reciprocity",
+    desc: "Allows the attorney general to enter into agreements with other states to recognize a concealed handgun permit as valid, and authorizes RI to honor out-of-state concealed weapon permits with certain requirements.",
+    status: "In Senate Judiciary Committee", introduced: "Jan 16, 2026",
+    legiscanUrl: "https://legiscan.com/RI/bill/S2153/2026",
+    pdfUrl: "https://webserver.rilegislature.gov/BillText26/SenateText26/S2153.pdf",
+    sponsor: "Republican",
+  },
+  {
+    num: "S2971", chamber: "Senate", type: "restriction",
+    title: "Voluntary Do-Not-Sell Firearm Registry",
+    desc: "Creates a process for an individual to voluntarily be added — temporarily or indefinitely — to a list restricting their own rights to purchase or possess firearms. Adds civil fines and misdemeanor penalties for violations.",
+    status: "In Senate Judiciary Committee", introduced: "Mar 4, 2026",
+    legiscanUrl: "https://legiscan.com/RI/bill/S2971/2026",
+    pdfUrl: "https://webserver.rilegislature.gov/BillText26/SenateText26/S2971.pdf",
+    sponsor: "Democrat",
+  },
+];
+
+const TYPE_META = {
+  restriction: { label: "Restriction / Control", color: "#c0392b", bg: "rgba(192,57,43,0.13)" },
+  expansion:   { label: "Expansion of Rights",   color: "#2eab7a", bg: "rgba(46,171,122,0.13)" },
+  mixed:       { label: "Mixed / Regulatory",     color: "#e8a838", bg: "rgba(232,168,56,0.13)"  },
+};
+
+const PIE_DATA = [
+  { type: "restriction", count: 5, color: "#c0392b" },
+  { type: "expansion",   count: 1, color: "#2eab7a" },
+  { type: "mixed",       count: 1, color: "#e8a838" },
+];
+const TOTAL = PIE_DATA.reduce((s, d) => s + d.count, 0);
+
+let activeType = null;
+
+// ── Pie ──────────────────────────────────────────────────────────────
+function buildPie(active) {
+  const svg = document.getElementById('pie-svg');
+  svg.innerHTML = '';
+  const size = 220, cx = 110, cy = 110, r = 82, ir = 44;
+  let angle = -Math.PI / 2;
+
+  PIE_DATA.forEach(d => {
+    const frac = d.count / TOTAL;
+    const start = angle, end = angle + frac * 2 * Math.PI;
+    angle = end;
+    const mid = (start + end) / 2;
+    const isAct = active === d.type;
+    const outerR = isAct ? r + 10 : r;
+    const ox = isAct ? Math.cos(mid) * 6 : 0;
+    const oy = isAct ? Math.sin(mid) * 6 : 0;
+    const largeArc = frac > 0.5 ? 1 : 0;
+    const pt = (rad, a) => [cx + ox + rad * Math.cos(a), cy + oy + rad * Math.sin(a)];
+    const [x1,y1] = pt(outerR, start), [x2,y2] = pt(outerR, end);
+    const [ix1,iy1] = pt(ir, start),   [ix2,iy2] = pt(ir, end);
+    const pathD = `M ${ix1} ${iy1} L ${x1} ${y1} A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${ir} ${ir} 0 ${largeArc} 0 ${ix1} ${iy1} Z`;
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', pathD);
+    path.setAttribute('fill', d.color);
+    path.setAttribute('stroke', '#0d1520');
+    path.setAttribute('stroke-width', '1.5');
+    path.style.cursor = 'pointer';
+    path.style.transition = 'all 0.25s cubic-bezier(.34,1.56,.64,1)';
+    path.style.filter = isAct ? `drop-shadow(0 3px 10px ${d.color}99)` : 'none';
+    path.addEventListener('mouseenter', () => setActive(d.type));
+    path.addEventListener('mouseleave', () => setActive(null));
+    path.addEventListener('click', () => setActive(activeType === d.type ? null : d.type));
+    svg.appendChild(path);
+  });
+
+  // Center text
+  const makeText = (txt, y, size, fill, weight) => {
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('x', cx); t.setAttribute('y', y);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('fill', fill);
+    t.style.fontSize = size + 'px';
+    t.style.fontWeight = weight;
+    t.style.fontFamily = "'Playfair Display', serif";
+    t.textContent = txt;
+    svg.appendChild(t);
+  };
+  makeText(TOTAL, cy + 8, 28, '#e8edf2', 700);
+
+  const sub = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  sub.setAttribute('x', cx); sub.setAttribute('y', cy + 26);
+  sub.setAttribute('text-anchor', 'middle');
+  sub.setAttribute('fill', '#7a8fa0');
+  sub.style.fontSize = '10px';
+  sub.style.fontFamily = "'DM Sans', sans-serif";
+  sub.style.letterSpacing = '1.5px';
+  sub.textContent = 'BILLS';
+  svg.appendChild(sub);
+}
+
+// ── Legend ───────────────────────────────────────────────────────────
+function buildLegend(active) {
+  const el = document.getElementById('legend');
+  el.innerHTML = '';
+  PIE_DATA.forEach(d => {
+    const meta = TYPE_META[d.type];
+    const isAct = active === d.type;
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.style.background = isAct ? meta.bg : 'transparent';
+    item.style.borderColor = isAct ? meta.color + '55' : 'transparent';
+
+    item.innerHTML = `
+      <div class="legend-dot" style="background:${d.color}"></div>
+      <div style="flex:1">
+        <div class="legend-label" style="color:${isAct ? '#e8edf2' : '#a0b8cc'}">${meta.label}</div>
+        <div class="legend-sub">${d.count} bill${d.count !== 1 ? 's' : ''} · ${Math.round(d.count/TOTAL*100)}%</div>
+      </div>
+      <span class="legend-count" style="color:${d.color}">${d.count}</span>
+    `;
+    item.addEventListener('mouseenter', () => setActive(d.type));
+    item.addEventListener('mouseleave', () => setActive(null));
+    item.addEventListener('click', () => setActive(activeType === d.type ? null : d.type));
+    el.appendChild(item);
+  });
+}
+
+// ── Filter badge ─────────────────────────────────────────────────────
+function buildBadge(active) {
+  const el = document.getElementById('filter-badge');
+  if (!active) { el.innerHTML = ''; return; }
+  const meta = TYPE_META[active];
+  const count = BILLS.filter(b => b.type === active).length;
+  el.innerHTML = `
+    <span class="badge" style="color:${meta.color};background:${meta.bg};border-color:${meta.color}44">
+      Showing: ${meta.label} &middot; ${count} bill${count !== 1 ? 's' : ''}
+      &nbsp;&middot;&nbsp;
+      <span class="clear" id="clear-filter">clear filter</span>
+    </span>`;
+  document.getElementById('clear-filter').addEventListener('click', () => setActive(null));
+}
+
+// ── Bill cards ───────────────────────────────────────────────────────
+function buildCards(active) {
+  const el = document.getElementById('bill-list');
+  el.innerHTML = '';
+  BILLS.forEach(bill => {
+    const meta = TYPE_META[bill.type];
+    const highlighted = !active || bill.type === active;
+    const card = document.createElement('div');
+    card.className = 'bill-card' + (highlighted ? '' : ' dimmed');
+    card.style.borderLeftColor = meta.color;
+    card.style.borderTopColor = highlighted ? meta.color + '55' : '#1e3045';
+    card.style.borderRightColor = highlighted ? meta.color + '55' : '#1e3045';
+    card.style.borderBottomColor = highlighted ? meta.color + '55' : '#1e3045';
+    card.style.background = highlighted ? meta.bg : '#121e2b';
+
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="card-tags">
+          <span class="tag" style="color:${meta.color};background:${meta.bg}">${bill.num}</span>
+          <span class="tag-sm" style="color:#7a8fa0;background:#1a2d3e">${bill.chamber}</span>
+          <span class="tag-sm" style="color:${meta.color};background:${meta.bg}">${meta.label}</span>
+        </div>
+        <div class="card-links">
+          <a href="${bill.legiscanUrl}" target="_blank" rel="noopener noreferrer" class="btn-link btn-legiscan">LegiScan ↗</a>
+          <a href="${bill.pdfUrl}" target="_blank" rel="noopener noreferrer" class="btn-link btn-pdf">PDF ↗</a>
+        </div>
+      </div>
+      <div class="card-title">${bill.title}</div>
+      <div class="card-desc">${bill.desc}</div>
+      <div class="card-meta">
+        <span><em>Introduced </em>${bill.introduced}</span>
+        <span><em>Status </em>${bill.status}</span>
+        <span><em>Sponsor </em>${bill.sponsor}</span>
+      </div>
+    `;
+    el.appendChild(card);
+  });
+}
+
+// ── State update ─────────────────────────────────────────────────────
+function setActive(type) {
+  activeType = type;
+  buildPie(type);
+  buildLegend(type);
+  buildBadge(type);
+  buildCards(type);
+}
+
+// ── Init ─────────────────────────────────────────────────────────────
+setActive(null);
+</script>
+</body>
+</html>

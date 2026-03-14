@@ -1,0 +1,37 @@
+name: Update RI Firearms Bills
+
+on:
+  schedule:
+    # Runs every Monday at 8:00 AM UTC
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+    # Also allows manual trigger from GitHub Actions tab
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # needed to commit index.html back to repo
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run bill updater
+        env:
+          LEGISCAN_API_KEY: ${{ secrets.LEGISCAN_API_KEY }}
+        run: python update_bills.py
+
+      - name: Commit and push updated index.html
+        run: |
+          git config user.name "anonymous"
+          git config user.email "anonymous@example.com"
+          git add index.html
+          git diff --staged --quiet || git commit -m "Auto-update: RI firearms bills $(date -u '+%Y-%m-%d')"
+          git push
