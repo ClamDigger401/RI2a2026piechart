@@ -710,7 +710,7 @@ async function generateLetters(mode) {
     });
 
     try {
-      const letterText = await generateOneLetter(firstName, lastName, town, bill, stance, allRecipients);
+      const letterText = await generateOneLetter(firstName, lastName, town, bill, stance, allRecipients, userLegislators);
       generatedLetters[billNum] = { recipients: allRecipients, text: letterText };
       if (mode === 'review') {
         renderLetterCard(bill, stance, allRecipients, letterText);
@@ -735,8 +735,25 @@ async function generateLetters(mode) {
   }
 }
 
-async function generateOneLetter(firstName, lastName, town, bill, stance, recipients) {
-  const recipientName = recipients.length > 0 ? recipients[0].name : 'Representative';
+async function generateOneLetter(firstName, lastName, town, bill, stance, recipients, myLegislators) {
+  // Salutation uses the constituent's own rep/senator — personal and direct
+  const myRep = myLegislators && myLegislators.length > 0 ? myLegislators[0] : null;
+  const mySen = myLegislators && myLegislators.length > 1 ? myLegislators[1] : null;
+
+  let salutation, salutationLine;
+  if (myRep && mySen) {
+    salutation = `${myRep.name} and ${mySen.name}`;
+    salutationLine = `Dear ${myRep.name} and ${mySen.name},`;
+  } else if (myRep) {
+    salutation = myRep.name;
+    salutationLine = `Dear ${myRep.name},`;
+  } else if (recipients.length > 0) {
+    salutation = recipients[0].name;
+    salutationLine = `Dear ${recipients[0].name},`;
+  } else {
+    salutation = 'Representative';
+    salutationLine = 'Dear Representative,';
+  }
   const stanceWord = stance === 'support' ? 'support' : 'oppose';
   const targetWords = 300 + Math.floor(Math.random() * 201); // 300–500
 
@@ -750,25 +767,26 @@ async function generateOneLetter(firstName, lastName, town, bill, stance, recipi
   ];
   const styleHint = styles[Math.floor(Math.random() * styles.length)];
 
+  const allRecipientNames = recipients.map(r => r.name).join(', ');
   const prompt = `You are writing a constituent letter on behalf of ${firstName} ${lastName} of ${town}, Rhode Island.
 
 Bill: RI 2026 ${bill.num} — "${bill.title}"
 What it does: ${bill.desc}
 Constituent's position: They ${stanceWord} this bill.
-Primary recipient: ${recipientName}
-All recipients: ${recipients.map(r => r.name).join(', ')}
+Salutation (their own elected rep/senator): ${salutation}
+All recipients this letter will also be sent to: ${allRecipientNames}
 
 ${styleHint}
 
 Write a complete, professional constituent letter with these qualities:
-- Opens with "Dear ${recipientName},"
-- Introduces ${firstName} as a resident of ${town} in the opening sentence
+- Opens with exactly: "${salutationLine}"
+- Introduces ${firstName} as a constituent and resident of ${town} in the opening sentence
 - States their position on ${bill.num} clearly and early
 - Gives 3-4 substantive, specific reasons for their position — grounded in real-world impact on Rhode Island residents, not abstract principles
 - Uses natural, human language — vary sentence length, include one personal or community-based observation
 - Maintains a respectful, professional tone throughout — firm but never combative
 - Closes with a specific ask (vote yes/no) and thanks the legislator for their public service
-- Signs off as: Respectfully,\n${firstName} ${lastName}\n${town}, Rhode Island
+- Signs off as: Respectfully,\n${firstName} ${lastName}\n${town}, Rhode Island\n(This letter is also being sent to: ${allRecipientNames})
 - Target length: approximately ${targetWords} words
 - Do NOT use placeholder text, brackets, or generic filler phrases like "as a concerned citizen" — write it fully and specifically`;
 
