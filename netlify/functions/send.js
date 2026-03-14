@@ -35,8 +35,8 @@ exports.handler = async (event) => {
   // Resend free tier requires sending from onboarding@resend.dev
   // until a custom domain is verified — display name shows constituent name
   const fromAddress = body.from && body.from.name
-    ? `${body.from.name} <onboarding@resend.dev>`
-    : "onboarding@resend.dev";
+    ? `${body.from.name} <noreply@not-the-end.com>`
+    : "noreply@not-the-end.com";
 
   const replyTo = (body.reply_to && body.reply_to.email)
     ? body.reply_to.email
