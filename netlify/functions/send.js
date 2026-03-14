@@ -1,3 +1,10 @@
+/**
+ * netlify/functions/send.js
+ * Proxy for SendGrid API — keeps API key server-side, avoids CORS.
+ * Sends as transactional mail to bypass CAN-SPAM footer requirement.
+ * Set SENDGRID_API_KEY in Netlify → Site Settings → Environment Variables.
+ */
+
 const https = require("https");
 
 exports.handler = async (event) => {
@@ -19,6 +26,18 @@ exports.handler = async (event) => {
   } catch {
     return { statusCode: 400, body: JSON.stringify({ error: "Invalid JSON" }) };
   }
+
+  // Mark as transactional — bypasses CAN-SPAM footer requirement
+  // Constituent letters to elected officials are transactional, not promotional
+  body.mail_settings = {
+    bypass_list_management: { enable: false },
+    footer: { enable: false },
+  };
+  body.tracking_settings = {
+    click_tracking: { enable: false },
+    open_tracking:  { enable: false },
+  };
+  body.categories = ["constituent-letter", "transactional"];
 
   const payload = JSON.stringify(body);
 
