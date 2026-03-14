@@ -1,8 +1,8 @@
 /**
  * netlify/functions/send.js
- * Proxy for SendGrid API — keeps API key server-side, avoids CORS.
- * Sends as transactional mail to bypass CAN-SPAM footer requirement.
- * Set SENDGRID_API_KEY in Netlify → Site Settings → Environment Variables.
+ * Proxy for Resend API — keeps API key server-side, avoids CORS.
+ * Set RESEND_API_KEY in Netlify → Site Settings → Environment Variables.
+ * Free tier: 3,000 emails/month, 100/day.
  */
 
 const https = require("https");
@@ -12,11 +12,11 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
-  const SENDGRID_KEY = process.env.SENDGRID_API_KEY;
-  if (!SENDGRID_KEY) {
+  const RESEND_KEY = process.env.RESEND_API_KEY;
+  if (!RESEND_KEY) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "SENDGRID_API_KEY not configured" }),
+      body: JSON.stringify({ error: "RESEND_API_KEY not configured" }),
     };
   }
 
@@ -27,29 +27,41 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: "Invalid JSON" }) };
   }
 
-  // Mark as transactional — bypasses CAN-SPAM footer requirement
-  // Constituent letters to elected officials are transactional, not promotional
-  body.mail_settings = {
-    bypass_list_management: { enable: false },
-    footer: { enable: false },
-  };
-  body.tracking_settings = {
-    click_tracking: { enable: false },
-    open_tracking:  { enable: false },
-  };
-  body.categories = ["constituent-letter", "transactional"];
+  // Convert SendGrid payload format to Resend format
+  const toAddresses = (body.personalizations?.[0]?.to || []).map(r =>
+    r.name ? `${r.name} <${r.email}>` : r.email
+  );
 
-  const payload = JSON.stringify(body);
+  // Resend free tier requires sending from onboarding@resend.dev
+  // until a custom domain is verified — display name shows constituent name
+  const fromAddress = body.from && body.from.name
+    ? `${body.from.name} <onboarding@resend.dev>`
+    : "onboarding@resend.dev";
+
+  const replyTo = (body.reply_to && body.reply_to.email)
+    ? body.reply_to.email
+    : (body.from && body.from.email ? body.from.email : "");
+
+  const textContent = (body.content || []).find(c => c.type === "text/plain");
+  const text = textContent ? textContent.value : "";
+
+  const resendPayload = JSON.stringify({
+    from: fromAddress,
+    to: toAddresses,
+    reply_to: replyTo,
+    subject: body.subject || "Constituent Letter",
+    text: text,
+  });
 
   return new Promise((resolve) => {
     const options = {
-      hostname: "api.sendgrid.com",
-      path: "/v3/mail/send",
+      hostname: "api.resend.com",
+      path: "/emails",
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${SENDGRID_KEY}`,
-        "Content-Length": Buffer.byteLength(payload),
+        "Authorization": "Bearer " + RESEND_KEY,
+        "Content-Length": Buffer.byteLength(resendPayload),
       },
     };
 
@@ -57,8 +69,10 @@ exports.handler = async (event) => {
       let data = "";
       res.on("data", (chunk) => { data += chunk; });
       res.on("end", () => {
+        // Resend returns 200 on success; normalize to 202 so frontend logic works
+        const statusCode = res.statusCode === 200 ? 202 : res.statusCode;
         resolve({
-          statusCode: res.statusCode,
+          statusCode,
           headers: { "Content-Type": "application/json" },
           body: data || JSON.stringify({ success: true }),
         });
@@ -72,7 +86,7 @@ exports.handler = async (event) => {
       });
     });
 
-    req.write(payload);
+    req.write(resendPayload);
     req.end();
   });
 };
