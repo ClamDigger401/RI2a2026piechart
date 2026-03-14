@@ -4,400 +4,240 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rhode Island 2026 — Firearms Legislation</title>
-  <meta name="description" content="Interactive breakdown of all 7 confirmed firearms bills introduced in the Rhode Island 2026 legislative session." />
+  <meta name="description" content="Interactive breakdown of all 38 confirmed firearms bills introduced in the Rhode Island 2026 legislative session." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: #0d1520;
-      color: #e8edf2;
-      font-family: 'DM Sans', sans-serif;
-      min-height: 100vh;
-      padding: 40px 20px 80px;
-    }
+    body { background: #0d1520; color: #e8edf2; font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 40px 20px 80px; }
     a { text-decoration: none; }
-    .wrap { max-width: 820px; margin: 0 auto; }
-
-    /* Header */
-    .eyebrow {
-      text-align: center;
-      font-size: 10px;
-      letter-spacing: 4px;
-      color: #c0392b;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-    h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(22px, 5vw, 36px);
-      font-weight: 700;
-      text-align: center;
-      color: #e8edf2;
-      line-height: 1.2;
-      margin-bottom: 8px;
-    }
-    .subtitle {
-      text-align: center;
-      color: #566778;
-      font-size: 12.5px;
-      margin-bottom: 40px;
-    }
-
-    /* Pie row */
-    .pie-row {
-      display: flex;
-      gap: 32px;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 36px;
-    }
-    #pie-svg { overflow: visible; display: block; cursor: pointer; }
-
-    /* Legend */
-    .legend { display: flex; flex-direction: column; gap: 10px; min-width: 200px; }
-    .legend-item {
-      display: flex; align-items: center; gap: 12px;
-      cursor: pointer; padding: 10px 14px; border-radius: 8px;
-      border: 1px solid transparent;
-      transition: all 0.2s ease;
-    }
-    .legend-dot { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
-    .legend-label { font-size: 13px; color: #a0b8cc; font-weight: 500; transition: color 0.2s; }
-    .legend-sub { font-size: 11px; color: #566778; }
-    .legend-count { font-size: 20px; font-weight: 700; }
-
-    /* Filter badge */
-    #filter-badge {
-      text-align: center;
-      margin-bottom: 18px;
-      min-height: 28px;
-    }
-    .badge {
-      display: inline-block;
-      font-size: 12px;
-      padding: 4px 14px;
-      border-radius: 20px;
-      border: 1px solid;
-    }
-    .badge .clear { cursor: pointer; text-decoration: underline; }
-
-    /* Bill cards */
-    #bill-list { display: flex; flex-direction: column; gap: 10px; }
-    .bill-card {
-      border-radius: 10px;
-      padding: 14px 16px;
-      transition: all 0.25s ease;
-      border-left-width: 3px;
-      border-left-style: solid;
-      border-top: 1px solid;
-      border-right: 1px solid;
-      border-bottom: 1px solid;
-    }
-    .bill-card.dimmed { opacity: 0.35; }
-    .card-top {
-      display: flex; justify-content: space-between;
-      align-items: flex-start; gap: 10px; margin-bottom: 6px;
-      flex-wrap: wrap;
-    }
-    .card-tags { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .tag {
-      font-family: monospace; font-weight: 800; font-size: 13px;
-      padding: 2px 8px; border-radius: 5px; letter-spacing: 0.5px;
-    }
-    .tag-sm {
-      font-size: 10px; padding: 2px 7px; border-radius: 4px;
-      letter-spacing: 1px; text-transform: uppercase;
-    }
-    .card-links { display: flex; gap: 8px; flex-shrink: 0; }
-    .btn-link {
-      font-size: 10px; padding: 3px 8px; border-radius: 4px;
-      letter-spacing: 0.5px; font-weight: 600; white-space: nowrap;
-      transition: opacity 0.15s;
-    }
-    .btn-link:hover { opacity: 0.75; }
-    .btn-legiscan { color: #4a9fd4; background: #4a9fd420; }
-    .btn-pdf { color: #a0b0c0; background: #1a2d3e; }
-    .card-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 14px; color: #d8e8f2; margin-bottom: 6px; line-height: 1.4;
-    }
-    .card-desc { font-size: 12px; color: #8fa8bc; line-height: 1.6; margin-bottom: 8px; }
-    .card-meta { display: flex; gap: 16px; flex-wrap: wrap; }
-    .card-meta span { font-size: 11px; color: #566778; }
-    .card-meta em { color: rgba(74,159,212,0.4); font-style: normal; }
-
-    /* Footer note */
-    .note {
-      margin-top: 32px; padding: 14px 18px;
-      background: #121e2b; border-radius: 8px;
-      border-left: 3px solid #1e3a55;
-      font-size: 11.5px; color: #4a6070; line-height: 1.7;
-    }
-    .note strong { color: #4a9fd4; }
+    .wrap { max-width: 900px; margin: 0 auto; }
+    .eyebrow { text-align:center; font-size:10px; letter-spacing:4px; color:#c0392b; text-transform:uppercase; margin-bottom:10px; }
+    h1 { font-family:'Playfair Display',serif; font-size:clamp(22px,5vw,36px); font-weight:700; text-align:center; color:#e8edf2; line-height:1.2; margin-bottom:8px; }
+    .subtitle { text-align:center; color:#566778; font-size:12.5px; margin-bottom:4px; }
+    .source-credit { text-align:center; font-size:11px; color:#3a5060; margin-bottom:36px; }
+    .source-credit a { color:#4a9fd4; }
+    .pie-row { display:flex; gap:32px; align-items:center; justify-content:center; flex-wrap:wrap; margin-bottom:36px; }
+    #pie-svg { overflow:visible; display:block; cursor:pointer; }
+    .legend { display:flex; flex-direction:column; gap:10px; min-width:220px; }
+    .legend-item { display:flex; align-items:center; gap:12px; cursor:pointer; padding:10px 14px; border-radius:8px; border:1px solid transparent; transition:all 0.2s ease; }
+    .legend-dot { width:14px; height:14px; border-radius:4px; flex-shrink:0; }
+    .legend-label { font-size:13px; color:#a0b8cc; font-weight:500; }
+    .legend-sub { font-size:11px; color:#566778; }
+    .legend-count { font-size:20px; font-weight:700; }
+    #filter-badge { text-align:center; margin-bottom:18px; min-height:28px; }
+    .badge { display:inline-block; font-size:12px; padding:4px 14px; border-radius:20px; border:1px solid; }
+    .badge .clear { cursor:pointer; text-decoration:underline; }
+    #bill-list { display:flex; flex-direction:column; gap:10px; }
+    .bill-card { border-radius:10px; padding:14px 16px; transition:all 0.25s ease; border-left-width:3px; border-left-style:solid; border-top:1px solid; border-right:1px solid; border-bottom:1px solid; }
+    .bill-card.dimmed { opacity:0.3; }
+    .card-top { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:6px; flex-wrap:wrap; }
+    .card-tags { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .tag { font-family:monospace; font-weight:800; font-size:13px; padding:2px 8px; border-radius:5px; letter-spacing:0.5px; }
+    .tag-sm { font-size:10px; padding:2px 7px; border-radius:4px; letter-spacing:1px; text-transform:uppercase; }
+    .card-links { display:flex; gap:8px; flex-shrink:0; }
+    .btn-link { font-size:10px; padding:3px 8px; border-radius:4px; letter-spacing:0.5px; font-weight:600; white-space:nowrap; transition:opacity 0.15s; }
+    .btn-link:hover { opacity:0.75; }
+    .btn-text { color:#4a9fd4; background:#4a9fd420; }
+    .card-title { font-family:'Playfair Display',serif; font-size:14px; color:#d8e8f2; margin-bottom:4px; line-height:1.4; }
+    .card-desc { font-size:12px; color:#8fa8bc; line-height:1.6; margin-bottom:6px; }
+    .card-changes { font-size:11.5px; color:#6a8898; line-height:1.6; margin-bottom:8px; border-left:2px solid #1e3a55; padding-left:10px; }
+    .card-meta { display:flex; gap:16px; flex-wrap:wrap; }
+    .card-meta span { font-size:11px; color:#566778; }
+    .card-meta em { color:rgba(74,159,212,0.4); font-style:normal; }
+    .note { margin-top:32px; padding:14px 18px; background:#121e2b; border-radius:8px; border-left:3px solid #1e3a55; font-size:11.5px; color:#4a6070; line-height:1.7; }
+    .note strong { color:#4a9fd4; }
+    .pbp-badge { display:inline-block; font-size:9px; padding:1px 6px; border-radius:3px; font-weight:700; letter-spacing:0.5px; margin-left:4px; vertical-align:middle; }
+    .pbp-green { background:#1a4a2a; color:#2eab7a; }
+    .pbp-red { background:#3a1a1a; color:#e74c3c; }
+    .pbp-orange { background:#3a2e1a; color:#e8a838; }
   </style>
 </head>
 <body>
 <div class="wrap">
-
   <div class="eyebrow">Rhode Island · 2026 Session</div>
   <h1>Firearms Legislation</h1>
-  <p class="subtitle">7 confirmed bills · January–March 2026 · All links go to official RI Legislature or LegiScan records</p>
-
+  <p class="subtitle">38 confirmed bills · January–March 2026</p>
+  <p class="source-credit">Source: <a href="https://parabellumprovisions.com" target="_blank" rel="noopener">Para Bellum Provisions</a> · Bill text links go to official RI Legislature · Color badges reflect Para Bellum's assessment</p>
   <div class="pie-row">
     <svg id="pie-svg" width="220" height="220" viewBox="0 0 220 220"></svg>
-
     <div class="legend" id="legend"></div>
   </div>
-
   <div id="filter-badge"></div>
   <div id="bill-list"></div>
-
   <div class="note">
-    <strong>Sources &amp; Methodology: </strong>
-    Bills confirmed via LegiScan and the RI Legislature's official webserver (webserver.rilegislature.gov/BillText26/).
-    H8073 and S2726 confirmed introduced Feb 27, 2026. S2153 confirmed Jan 16, 2026. S2971 confirmed Mar 4, 2026.
-    PDF links point directly to official RI Legislature bill text. Session ongoing — additional bills may be introduced.
-    Hover or tap the pie chart or legend to filter by type.
+    <strong>Sources: </strong>
+    Bill data sourced from <a href="https://parabellumprovisions.com" target="_blank" rel="noopener" style="color:#4a9fd4">Para Bellum Provisions 2026 Legislation page</a> and the RI Legislature's official website.
+    Color badges (Favorable / Unfavorable / Neutral) reflect Para Bellum Provisions' editorial assessment.
+    Classification (Restriction / Expansion / Mixed) is editorial. All bills as of early March 2026 — session ongoing.
+    Hover or tap the pie or legend to filter by type.
   </div>
-
 </div>
-
 <script>
 const BILLS = [
-  {
-    num: "H8073", chamber: "House", type: "restriction",
-    title: "Possession of Prohibited Firearms Ban",
-    desc: "Expands 2025 assault weapons sales ban to also prohibit POSSESSION of prohibited firearms. Violators face up to 10 years and/or $10,000 fine. Effective July 1, 2026.",
-    status: "In House Judiciary Committee", introduced: "Feb 27, 2026",
-    legiscanUrl: "https://legiscan.com/RI/bill/H8073/2026",
-    pdfUrl: "https://webserver.rilegislature.gov/BillText26/HouseText26/H8073.pdf",
-    sponsor: "Democrat (9 co-sponsors)",
-  },
-  {
-    num: "H7755", chamber: "House", type: "restriction",
-    title: "Responsible Firearm Purchasing Act — Expansion",
-    desc: "Expands existing handgun training certificate requirement to cover all rifles and shotguns. Adds 7-day waiting period for long guns. New purchasers must provide valid certificate from AG.",
-    status: "In House Judiciary Committee", introduced: "Jan 2026",
-    legiscanUrl: "https://legiscan.com/RI/bill/H7755/2026",
-    pdfUrl: "https://webserver.rilegislature.gov/BillText26/HouseText26/H7755.pdf",
-    sponsor: "Democrat",
-  },
-  {
-    num: "S2726", chamber: "Senate", type: "restriction",
-    title: "Responsible Firearm Purchasing Act (Senate)",
-    desc: "Senate companion to H7755. Requires all persons seeking to possess a firearm — except police and military — to complete and pass a basic firearm safety training course.",
-    status: "In Senate Judiciary Committee", introduced: "Feb 27, 2026",
-    legiscanUrl: "https://legiscan.com/RI/bill/S2726/2026",
-    pdfUrl: "https://webserver.rilegislature.gov/BillText26/SenateText26/S2726.pdf",
-    sponsor: "Democrat (8 co-sponsors)",
-  },
-  {
-    num: "S2611", chamber: "Senate", type: "restriction",
-    title: "Firearm Industry Accountability Act",
-    desc: "Establishes the Rhode Island Firearm Industry Accountability Act of 2026. Creates civil liability framework for manufacturers and dealers who fail to implement reasonable controls against illegal sales.",
-    status: "In Senate Judiciary Committee", introduced: "Feb 13, 2026",
-    legiscanUrl: "https://legiscan.com/RI/bill/S2611/2026",
-    pdfUrl: "https://webserver.rilegislature.gov/BillText26/SenateText26/S2611.pdf",
-    sponsor: "Democrat",
-  },
-  {
-    num: "H7650", chamber: "House", type: "mixed",
-    title: "Stun Gun Carry Permit & Transfer Penalties",
-    desc: "Permits persons 18+ with a license or permit to carry a stun gun. Imposes criminal penalties for unlawful sale or transfer of stun guns to minors or prohibited persons.",
-    status: "In House Judiciary Committee", introduced: "Jan 2026",
-    legiscanUrl: "https://legiscan.com/RI/bill/H7650/2026",
-    pdfUrl: "https://webserver.rilegislature.gov/BillText26/HouseText26/H7650.pdf",
-    sponsor: "Democrat",
-  },
-  {
-    num: "S2153", chamber: "Senate", type: "expansion",
-    title: "Concealed Carry Reciprocity",
-    desc: "Allows the attorney general to enter into agreements with other states to recognize a concealed handgun permit as valid, and authorizes RI to honor out-of-state concealed weapon permits with certain requirements.",
-    status: "In Senate Judiciary Committee", introduced: "Jan 16, 2026",
-    legiscanUrl: "https://legiscan.com/RI/bill/S2153/2026",
-    pdfUrl: "https://webserver.rilegislature.gov/BillText26/SenateText26/S2153.pdf",
-    sponsor: "Republican",
-  },
-  {
-    num: "S2971", chamber: "Senate", type: "restriction",
-    title: "Voluntary Do-Not-Sell Firearm Registry",
-    desc: "Creates a process for an individual to voluntarily be added — temporarily or indefinitely — to a list restricting their own rights to purchase or possess firearms. Adds civil fines and misdemeanor penalties for violations.",
-    status: "In Senate Judiciary Committee", introduced: "Mar 4, 2026",
-    legiscanUrl: "https://legiscan.com/RI/bill/S2971/2026",
-    pdfUrl: "https://webserver.rilegislature.gov/BillText26/SenateText26/S2971.pdf",
-    sponsor: "Democrat",
-  },
+  { num:"H7035", chamber:"House", type:"restriction", pbp:"red", title:"One Firearm Per 30 Days Limit", desc:"Prohibits the purchase of more than one firearm in a thirty (30) day period, with exemptions for law enforcement, inheritance, instruction, temporary rentals at ranges, and licensed collectors.", changes:"Creates a new '1 gun per 30 days' limit covering pistols, rifles, and shotguns. Penalties escalate from misdemeanor (first offense) to felony (subsequent offenses).", status:"Referred to House Judiciary", introduced:"2026", sponsor:"Rep. Boylan + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H7035.pdf" },
+  { num:"H7128", chamber:"House", type:"expansion", pbp:"green", title:"Armed Campus Police Mandate (House)", desc:"Mandates arming campus police at public higher educational institutions and includes campus police in the definition of 'law enforcement officer' for the law enforcement officers' bill of rights.", changes:"Allows campus police at public higher-ed institutions to carry firearms when authorized, tied to training requirements. Amends due-process framework to include campus police.", status:"Referred to House Judiciary", introduced:"2026", sponsor:"Rep. O'Brien + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H7128.pdf" },
+  { num:"H7133", chamber:"House", type:"restriction", pbp:"orange", title:"Domestic Abuse — Firearm Surrender Procedures", desc:"Permits family court to award custody of household pets in domestic abuse complaints. Sets firearm surrender procedures and restricts firearm access for respondents while orders are active.", changes:"Sets requirements for firearm surrender procedures and restricting access for respondents while active orders are in place. Sets related court process requirements around compliance and restoration.", status:"Referred to House Judiciary", introduced:"2026", sponsor:"Rep. J. Lombardi + 4 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H7133.pdf" },
+  { num:"H7145", chamber:"House", type:"mixed", pbp:"green", title:"Dillon's Law — Safe Storage Renaming", desc:"Amends the heading of §11-47-60.1 to include the words 'Dillon's Law.' Does not change the underlying safe-storage rules; changes the heading language only.", changes:"Renames the statutory section heading for the safe-storage/unsafe-storage firearm law to add the label 'Dillon's Law.'", status:"Referred to House Judiciary", introduced:"2026", sponsor:"Rep. Fellela + 4 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H7145.pdf" },
+  { num:"H7546", chamber:"House", type:"mixed", pbp:"orange", title:"Peace Officer Definition Expansion (DCYF)", desc:"Expands the definition of peace officers to include juvenile program workers and shift coordinators at the Department of Youth, Children and Families.", changes:"Broadens the statutory peace officer definition to include specified DCYF roles, affecting related powers and duties in enforcement contexts.", status:"Referred to House Judiciary (02/06/2026)", introduced:"Feb 6, 2026", sponsor:"Rep. Matthew Dawson", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H7546.pdf" },
+  { num:"H7553", chamber:"House", type:"expansion", pbp:"green", title:"Carry Permit Review & Appeal Process (House)", desc:"Provides the review and appeal process for individuals applying for a permit or license to carry a handgun with the licensing authority or attorney general.", changes:"Establishes/clarifies how applicants can seek review and appeal when a carry permit/license decision is denied by the licensing authority or the attorney general.", status:"Referred to House Judiciary (02/06/2026)", introduced:"Feb 6, 2026", sponsor:"Rep. Noret + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H7553.pdf" },
+  { num:"H7557", chamber:"House", type:"restriction", pbp:"red", title:"RI Firearm Industry Accountability Act (House)", desc:"Establishes the Rhode Island Firearm Industry Accountability Act of 2026 as a new chapter in Title 23 (Health and Safety), with defined terms and regulatory framework language.", changes:"Positioned as an industry-accountability measure rather than a direct permit or possession bill. Creates civil enforcement remedies.", status:"Referred to House Judiciary", introduced:"2026", sponsor:"Rep. Donovan + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H7557.pdf" },
+  { num:"H7593", chamber:"House", type:"expansion", pbp:"green", title:"Sales Tax Exemption — Firearm Safety Equipment", desc:"Exempts from sales tax firearm safety equipment and storage devices, including gun safes, gun cabinets, gun vaults, gun cases, strong boxes, cable locks, trigger locks, and biometric locks.", changes:"Removes Rhode Island sales and use tax on firearm safety and secure-storage products. Lowers the cost of locks and safes, potentially encouraging safer storage.", status:"Referred to House Finance", introduced:"2026", sponsor:"Rep. Chippendale + 6 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H7593.pdf" },
+  { num:"H7636", chamber:"House", type:"restriction", pbp:"orange", title:"Voluntary Firearm Restrictions Act (House)", desc:"Creates a process for individuals to voluntarily be temporarily or indefinitely added to a list restricting their rights to purchase or possess firearms. Adds civil fines and misdemeanor for violations.", changes:"Establishes AG-administered voluntary restriction lists; blocks firearm purchase/possession while listed; suspends concealed carry permit during listing; sets removal timelines and record confidentiality.", status:"Referred to House Judiciary", introduced:"2026", sponsor:"Rep. Boylan + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H7636.pdf" },
+  { num:"H7650", chamber:"House", type:"mixed", pbp:"orange", title:"Stun Gun Carry Permit & Transfer Penalties", desc:"Provides that any person 18+ who is issued a license or permit may carry a stun gun; imposes criminal penalties for selling or transferring a stun gun to someone under eighteen.", changes:"Allows licensed/permitted adults to carry a stun gun and establishes criminal penalties for unlawful sale/transfer to minors.", status:"Referred to House Judiciary", introduced:"2026", sponsor:"Rep. Lima + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H7650.pdf" },
+  { num:"H7753", chamber:"House", type:"expansion", pbp:"green", title:"Felony — Disarming a Peace Officer (House)", desc:"Makes it a felony to remove or attempt to remove any firearm, weapon, or communication device from any peace officer or investigator of the department of attorney general.", changes:"Creates/clarifies a felony offense for disarming covered law-enforcement personnel and for removing specified communication devices.", status:"Referred to House Judiciary", introduced:"2026", sponsor:"Rep. Earl Read + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H7753.pdf" },
+  { num:"H7754", chamber:"House", type:"restriction", pbp:"red", title:"Eliminate Non-Resident Concealed Carry Reciprocity", desc:"Deletes the provision permitting out-of-state residents to obtain concealed carry permits in RI solely based on their rights in other states.", changes:"Tightens eligibility for non-resident concealed-carry permitting by removing reciprocity-style qualifying language. Disallows RI residents from applying in a town where they don't live or work if they hold an out-of-state permit.", status:"Referred to House Judiciary", introduced:"2026", sponsor:"Rep. Fogarty + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H7754.pdf" },
+  { num:"H7755", chamber:"House", type:"restriction", pbp:"red", title:"Responsible Firearm Purchasing Act (House)", desc:"Requires changes to firearm-purchase/possession qualification process, including a basic firearm safety training requirement for most applicants, with listed exemptions.", changes:"Adds prerequisites to lawful firearm purchasing/possession by requiring a safety training component. Expands the purchase/safety-certificate framework from pistols/revolvers to all firearms.", status:"Referred to House Judiciary", introduced:"2026", sponsor:"Rep. Boylan + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H7755.pdf" },
+  { num:"H8067", chamber:"House", type:"restriction", pbp:"red", title:"Felony Conviction Firearm Disqualification (House)", desc:"Disqualifies individuals with prior felony convictions from purchasing or possessing a firearm.", changes:"Would bar people with prior felony convictions from buying or possessing firearms under Rhode Island law.", status:"Referred to House Judiciary (02/27/2026)", introduced:"Feb 27, 2026", sponsor:"Rep. Furtado + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H8067.pdf" },
+  { num:"H8068", chamber:"House", type:"restriction", pbp:"orange", title:"Minor Firearm Possession Prohibition", desc:"Specifies that it is unlawful for any person under the age of 18 to possess a firearm.", changes:"Makes under-18 possession unlawful except in listed supervised or activity-based exceptions such as supervised range or hunting contexts.", status:"Referred to House Judiciary (02/27/2026)", introduced:"Feb 27, 2026", sponsor:"Rep. Boylan + 7 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H8068.pdf" },
+  { num:"H8069", chamber:"House", type:"mixed", pbp:"orange", title:"Shooting Range — Suicide Prevention Signage (House)", desc:"Requires shooting ranges to post signs in any area in which shooting occurs with 988 Suicide and Crisis hotline information.", changes:"Adds a new operational requirement for ranges tied to mental health outreach. Does not ban or expand firearm possession directly.", status:"Referred to House Judiciary (02/27/2026)", introduced:"Feb 27, 2026", sponsor:"Rep. Donovan + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H8069.pdf" },
+  { num:"H8070", chamber:"House", type:"expansion", pbp:"green", title:"Campus Stun Gun & Pepper Spray Self-Defense", desc:"Amends the 'weapons other than firearms prohibited' statute to allow any student, professor, or employee of any public or private college or university to carry a stun gun or pepper spray for self-defense.", changes:"Creates a specific self-defense exception for college and university students and employees to possess stun guns or pepper spray on campus.", status:"Referred to House Judiciary (02/27/2026)", introduced:"Feb 27, 2026", sponsor:"Rep. Hopkins + 5 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H8070.pdf" },
+  { num:"H8071", chamber:"House", type:"restriction", pbp:"red", title:"Ammunition Background Check Requirement", desc:"Prohibits the sale or transfer of ammunition unless the purchaser successfully undergoes a background check.", changes:"Requires a background check before most ammunition sales or transfers. Bars ammunition possession by people already prohibited from possessing firearms. Adds penalties for unlawful possession and for sellers who violate requirements.", status:"Referred to House Judiciary (02/27/2026)", introduced:"Feb 27, 2026", sponsor:"Rep. Caldwell + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H8071.pdf" },
+  { num:"H8072", chamber:"House", type:"mixed", pbp:"green", title:"Stun Gun Legalization for Adults (House)", desc:"Allows a person over 18 to purchase a stun gun or electronic dart gun; prohibits sale to persons under 18; criminalizes use in a crime or against a police officer.", changes:"Legalizes adult purchase of stun guns/electronic dart guns while barring sales to minors. Adds criminal penalties when those devices are used during a crime or against a police officer.", status:"Introduced 2026", introduced:"2026", sponsor:"Rep. Casey + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H8072.pdf" },
+  { num:"H8073", chamber:"House", type:"restriction", pbp:"red", title:"Prohibited Firearms — Possession Ban (House)", desc:"Restricts the possession of prohibited firearms. Expands current prohibited-firearms statute from manufacturing, sale, transfer, and purchase to also explicitly ban possession.", changes:"Keeps limited exceptions for certain pre-July 1, 2026 owners, federally licensed dealers, and law enforcement. Effective July 1, 2026.", status:"Referred to House Judiciary (02/27/2026)", introduced:"Feb 27, 2026", sponsor:"Rep. Tanzi + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H8073.pdf" },
+  { num:"H8075", chamber:"House", type:"restriction", pbp:"red", title:"Mandatory Firearm Liability Insurance ($1,000,000)", desc:"Requires any individual who owns a firearm to obtain and continuously maintain at least $1,000,000 in liability insurance covering damages from negligent acts involving the firearm. Exempts active-duty law enforcement and military.", changes:"Creates a new firearm-owner insurance mandate. Treats a firearm as 'owned' until loss/theft is reported. Requires proof to be kept with stored/transported firearms and shown during lawful law-enforcement encounters.", status:"Referred to House Judiciary (02/27/2026)", introduced:"Feb 27, 2026", sponsor:"Rep. Caldwell + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H8075.pdf" },
+  { num:"S2053", chamber:"Senate", type:"expansion", pbp:"green", title:"Armed Campus Police Mandate (Senate)", desc:"Mandates arming campus police at public higher educational institutions and includes campus police in the definition of 'law enforcement officer' for the law enforcement officers' bill of rights.", changes:"Requires public college and university campus police to be armed subject to training requirements. Updates definitions so campus police are treated as 'law enforcement officers' for certain legal protections.", status:"Referred to Senate Judiciary", introduced:"2026", sponsor:"Sen. Appollonio + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2053.pdf" },
+  { num:"S2056", chamber:"Senate", type:"restriction", pbp:"red", title:"Felony Conviction Firearm Disqualification (Senate)", desc:"Disqualifies individuals with prior felony convictions or nolo contendere pleas from purchasing or possessing a firearm. Prevents the sentencing judge from suspending the first two years of any sentence under limited circumstances.", changes:"Tightens firearm disqualification rules for people with felony convictions or nolo contendere pleas. Restricts sentence suspension under specified circumstances.", status:"Referred to Senate Judiciary", introduced:"2026", sponsor:"Sen. Euer + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2056.pdf" },
+  { num:"S2086", chamber:"Senate", type:"expansion", pbp:"green", title:"Sales Tax Exemption — Firearms & Ammunition (Senate)", desc:"Exempts from sales tax the sale of firearms and ammunition, firearms safety devices, and related services.", changes:"Adds firearms, ammunition, safety devices, and certain related services to the list of items exempt from Rhode Island sales and use tax. Effective upon passage.", status:"Referred to Senate Finance", introduced:"2026", sponsor:"Sen. Paolino + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2086.pdf" },
+  { num:"S2144", chamber:"Senate", type:"restriction", pbp:"orange", title:"Domestic Violence — Batterers Intervention Program", desc:"Permits the court to determine the number of hours a person must complete of a batterers intervention program and gives the court discretion on financial responsibility for costs.", changes:"Changes domestic violence case requirements around batterers intervention programs by letting the court set required hours and exercise discretion over defendant payment responsibility.", status:"Referred to Senate Judiciary", introduced:"2026", sponsor:"Sen. Matthew L. LaMountain", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2144.pdf" },
+  { num:"S2153", chamber:"Senate", type:"expansion", pbp:"green", title:"Concealed Carry Reciprocity (Senate)", desc:"Allows the attorney general to enter into agreements with other states to recognize a concealed handgun permit as valid. Authorizes RI to honor out-of-state concealed weapon permits with certain requirements.", changes:"Expands recognition of out-of-state concealed carry permits. Clarifies concealed carry treatment for active-duty out-of-state law enforcement with appropriate credentials.", status:"Referred to Senate Judiciary", introduced:"Jan 16, 2026", sponsor:"Sen. Rogers + 3 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2153.pdf" },
+  { num:"S2155", chamber:"Senate", type:"expansion", pbp:"green", title:"Permitless Concealed Carry (21+)", desc:"Permits RI residents 21+ to carry a concealed handgun without a permit, subject to four conditions: not prohibited from possessing a firearm; certificate of shooting proficiency; DEM safety certificate; and government photo ID.", changes:"Creates a permitless concealed carry pathway for RI residents age 21+ if they meet listed qualification, safety-certificate, and ID requirements.", status:"Referred to Senate Judiciary", introduced:"2026", sponsor:"Sen. Rogers + 3 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2155.pdf" },
+  { num:"S2163", chamber:"Senate", type:"expansion", pbp:"green", title:"Carry Permit Appeal — Trial De Novo (Senate)", desc:"Provides the review and appeal process for individuals applying for a carry permit, including a reconsideration meeting and an appeal to superior court for a trial de novo. Keeps related records nonpublic.", changes:"Sets up a structured reconsideration and appeal process when a concealed carry permit is denied, including deadlines, procedures, and confidentiality rules.", status:"Referred to Senate Judiciary", introduced:"2026", sponsor:"Sen. de la Cruz + 6 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2163.pdf" },
+  { num:"S2164", chamber:"Senate", type:"expansion", pbp:"green", title:"Concealed Carry Permit Framework Overhaul", desc:"Defines 'suitable person' for concealed carry purposes, establishes reasons for applying, establishes application information requirements, creates an appeal process, and makes permit records non-public.", changes:"Overhauls multiple parts of RI's concealed carry framework. Sets standards for approvals, denials, and confidentiality around permit and appeal records.", status:"Referred to Senate Judiciary", introduced:"2026", sponsor:"Sen. Rogers + 3 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2164.pdf" },
+  { num:"S2277", chamber:"Senate", type:"expansion", pbp:"green", title:"Concealed Carry Permit Reform (Alternate Senate)", desc:"Defines suitable person for concealed carry permit purposes, establishes reasons for applying, establishes information requirements on applications, establishes an appeal process, and provides that records are not public.", changes:"Changes the concealed carry permitting system by setting new definitions, applicant criteria, and documentation requirements. Specifies an appeals pathway and limits public access to permit and appeal records.", status:"Referred to Senate Judiciary", introduced:"2026", sponsor:"Sen. Rogers + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2277.pdf" },
+  { num:"S2283", chamber:"Senate", type:"expansion", pbp:"green", title:"Civil Liability for Gun-Free Zone Harm", desc:"Provides a cause of action against an individual or entity that prohibits the possession of firearms on real property (except residences) by an individual authorized and licensed to carry a firearm.", changes:"Creates a new civil liability theory for property owners that post firearm-prohibited notices, if a licensed gun owner is harmed and claims the harm could have been avoided. Sets a three-year limitations period.", status:"Referred to Senate Judiciary", introduced:"2026", sponsor:"Sen. de la Cruz + 6 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2283.pdf" },
+  { num:"S2285", chamber:"Senate", type:"restriction", pbp:"green", title:"Enhanced Penalties — Stolen Firearm in Violent Crime", desc:"Increases sentences for carrying a stolen firearm when committing a crime of violence and for possessing a stolen firearm. Requires convicted persons to serve a period ineligible for parole or probation.", changes:"Increases mandatory penalties for using or possessing a stolen firearm in a violent crime. Expands no-parole/no-probation minimums, with stronger escalation for repeat offenses.", status:"Referred to Senate Judiciary", introduced:"2026", sponsor:"Sen. Raptakis + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2285.pdf" },
+  { num:"S2292", chamber:"Senate", type:"expansion", pbp:"green", title:"Felony — Disarming a Peace Officer (Senate)", desc:"Makes it a felony to remove or attempt to remove any firearm, weapon, or communication device from any peace officer or investigator of the department of attorney general.", changes:"Creates a new felony offense for knowingly trying to take a firearm, weapon, or certain devices from a peace officer during official duties. Sets a mandatory imprisonment range.", status:"Referred to Senate Judiciary", introduced:"2026", sponsor:"Sen. DiPalma + 7 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2292.pdf" },
+  { num:"S2295", chamber:"Senate", type:"restriction", pbp:"red", title:"One Firearm Per 30 Days Limit (Senate)", desc:"Prohibits the purchase of more than one firearm in a thirty (30) day period, with exemptions including law enforcement, inheritance, participation in courses of instruction, temporary rentals, and licensed collectors.", changes:"Establishes a one-gun-per-30-days limit for most buyers, while carving out multiple listed exemptions. Sets misdemeanor penalties for a first offense and felony penalties for subsequent offenses.", status:"Referred to Senate Judiciary", introduced:"2026", sponsor:"Sen. McKenney + 4 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2295.pdf" },
+  { num:"S2306", chamber:"Senate", type:"expansion", pbp:"green", title:"Suppressor/Silencer Legalization for Hunting", desc:"Permits the possession or use of a muffler, silencer, or other device on any firearm longer than 17 inches in length, and permits use while hunting with a valid hunting license. Preempts local regulations.", changes:"Relaxes state restrictions on suppressors/silencers for firearms over a specified length, and authorizes their use for hunting if properly licensed. Preempts local/state agencies from creating rules that would restrict that right.", status:"Referred to Senate Judiciary", introduced:"2026", sponsor:"Sen. Rogers + 5 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2306.pdf" },
+  { num:"S2314", chamber:"Senate", type:"mixed", pbp:"green", title:"Large Capacity Feeding Device — Penalty Reform", desc:"Makes a first offense of possessing a large capacity feeding device a misdemeanor and subsequent offenses felonies.", changes:"Changes the penalty structure for illegal possession of a large capacity feeding device by making the first conviction a misdemeanor and later convictions felonies. Leaves the underlying prohibition in place.", status:"Referred to Senate Judiciary", introduced:"2026", sponsor:"Sen. Raptakis + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2314.pdf" },
+  { num:"S2395", chamber:"Senate", type:"mixed", pbp:"green", title:"Stun Gun Legalization for Adults (Senate)", desc:"Provides that a person over 18 can purchase and possess a stun gun or electronic dart gun; prohibits sale to persons under 18; criminalizes use in any criminal offense or against any police officer.", changes:"Legalizes adult (18+) purchase/possession of stun guns/electronic dart guns while criminalizing sales to minors. Bars possession by prohibited firearm possessors or those with felony/nolo contendere history.", status:"Referred to Senate Judiciary", introduced:"2026", sponsor:"Sen. Thompson + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2395.pdf" },
+  { num:"S2611", chamber:"Senate", type:"restriction", pbp:"red", title:"RI Firearm Industry Accountability Act (Senate)", desc:"Establishes the Rhode Island Firearm Industry Accountability Act of 2026. Creates requirements on firearm industry members including controls, possession, and advertising. Provides civil enforcement remedies and fee shifting.", changes:"Creates a new Title 23 chapter establishing requirements on firearm industry members. Effective October 1, 2026.", status:"Referred to Senate Judiciary (02/13/2026)", introduced:"Feb 13, 2026", sponsor:"Sen. Lauria + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2611.pdf" },
+  { num:"S2710", chamber:"Senate", type:"restriction", pbp:"red", title:"Prohibited Firearms — Possession Ban (Senate)", desc:"Restricts the possession of prohibited firearms. Would expand Rhode Island's prohibited-firearms law to cover possession, not just manufacture, sale, transfer, or purchase.", changes:"Senate companion to H8073. Expands the prohibited-firearms framework to explicitly cover possession.", status:"Referred to Senate Judiciary (02/27/2026)", introduced:"Feb 27, 2026", sponsor:"Sen. Mack + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2710.pdf" },
+  { num:"S2726", chamber:"Senate", type:"restriction", pbp:"red", title:"Responsible Firearm Purchasing Act (Senate)", desc:"Cited as the 'Responsible Firearm Purchasing Act.' Amends §11-47-35 to change 'Sale of concealable weapons' to 'Sale of firearms,' defining firearm to include rifle, shotgun, pistol, or revolver.", changes:"Expands the purchase process and safety-certificate framework from pistols/revolvers to firearms generally. Repeals §§11-47-35.1 and 11-47-35.2.", status:"Referred to Senate Judiciary (02/27/2026)", introduced:"Feb 27, 2026", sponsor:"Sen. McKenney + 7 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2726.pdf" },
+  { num:"S2958", chamber:"Senate", type:"mixed", pbp:"orange", title:"Shooting Range Suicide Awareness — Signage & Training (Senate)", desc:"Requires shooting ranges to post suicide-awareness signs (English/Spanish) where shooting occurs and requires employee training to recognize suicide warning signs.", changes:"Adds a new 'Shooting ranges — Suicide awareness' section with mandatory signage, nonmember accompaniment at member ranges, and employee training starting 01/01/2027.", status:"Referred to Senate Judiciary", introduced:"2026", sponsor:"Sen. DiPalma + 3 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2958.pdf" },
+  { num:"S2971", chamber:"Senate", type:"restriction", pbp:"orange", title:"Voluntary Do-Not-Sell Firearm Registry (Senate)", desc:"Creates a process for individuals to voluntarily be temporarily or indefinitely added to a list restricting firearm purchase/possession. Provides removal rules, requires record destruction, sets penalties/fines.", changes:"Establishes voluntary 'do-not-sell/do-not-possess' restriction lists with administrative procedures, confidentiality/record-destruction rules, and penalties for violations.", status:"Referred to Senate Judiciary", introduced:"Mar 4, 2026", sponsor:"Sen. Valverde + 8 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S2971.pdf" },
+  { num:"S3038", chamber:"Senate", type:"restriction", pbp:"red", title:"Extreme Risk Protection Orders — Involuntary ER Transport", desc:"Amends the extreme risk protection order law's temporary-order proceedings. Revises §8-8.3-4 and adds/clarifies requirements, including protective-custody/emergency-room language.", changes:"Requires involuntary, non-optional transport to ER for evaluation on any ERPO, before the respondent can speak on their own behalf.", status:"Referred to Senate Judiciary (03/05/2026)", introduced:"Mar 5, 2026", sponsor:"Sen. Patalano + 6 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/SenateText26/S3038.pdf" },
 ];
 
 const TYPE_META = {
-  restriction: { label: "Restriction / Control", color: "#c0392b", bg: "rgba(192,57,43,0.13)" },
-  expansion:   { label: "Expansion of Rights",   color: "#2eab7a", bg: "rgba(46,171,122,0.13)" },
-  mixed:       { label: "Mixed / Regulatory",     color: "#e8a838", bg: "rgba(232,168,56,0.13)"  },
+  restriction: { label:"Restriction / Control", color:"#c0392b", bg:"rgba(192,57,43,0.13)" },
+  expansion:   { label:"Expansion of Rights",   color:"#2eab7a", bg:"rgba(46,171,122,0.13)" },
+  mixed:       { label:"Mixed / Regulatory",     color:"#e8a838", bg:"rgba(232,168,56,0.13)" },
 };
+const PIE_DATA = (()=>{
+  const c={restriction:0,expansion:0,mixed:0};
+  BILLS.forEach(b=>c[b.type]++);
+  return [
+    {type:"restriction",count:c.restriction,color:"#c0392b"},
+    {type:"expansion",  count:c.expansion,  color:"#2eab7a"},
+    {type:"mixed",      count:c.mixed,      color:"#e8a838"},
+  ];
+})();
+const TOTAL=BILLS.length;
+let activeType=null;
 
-const PIE_DATA = [
-  { type: "restriction", count: 5, color: "#c0392b" },
-  { type: "expansion",   count: 1, color: "#2eab7a" },
-  { type: "mixed",       count: 1, color: "#e8a838" },
-];
-const TOTAL = PIE_DATA.reduce((s, d) => s + d.count, 0);
-
-let activeType = null;
-
-// ── Pie ──────────────────────────────────────────────────────────────
-function buildPie(active) {
-  const svg = document.getElementById('pie-svg');
-  svg.innerHTML = '';
-  const size = 220, cx = 110, cy = 110, r = 82, ir = 44;
-  let angle = -Math.PI / 2;
-
-  PIE_DATA.forEach(d => {
-    const frac = d.count / TOTAL;
-    const start = angle, end = angle + frac * 2 * Math.PI;
-    angle = end;
-    const mid = (start + end) / 2;
-    const isAct = active === d.type;
-    const outerR = isAct ? r + 10 : r;
-    const ox = isAct ? Math.cos(mid) * 6 : 0;
-    const oy = isAct ? Math.sin(mid) * 6 : 0;
-    const largeArc = frac > 0.5 ? 1 : 0;
-    const pt = (rad, a) => [cx + ox + rad * Math.cos(a), cy + oy + rad * Math.sin(a)];
-    const [x1,y1] = pt(outerR, start), [x2,y2] = pt(outerR, end);
-    const [ix1,iy1] = pt(ir, start),   [ix2,iy2] = pt(ir, end);
-    const pathD = `M ${ix1} ${iy1} L ${x1} ${y1} A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${ir} ${ir} 0 ${largeArc} 0 ${ix1} ${iy1} Z`;
-
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', pathD);
-    path.setAttribute('fill', d.color);
-    path.setAttribute('stroke', '#0d1520');
-    path.setAttribute('stroke-width', '1.5');
-    path.style.cursor = 'pointer';
-    path.style.transition = 'all 0.25s cubic-bezier(.34,1.56,.64,1)';
-    path.style.filter = isAct ? `drop-shadow(0 3px 10px ${d.color}99)` : 'none';
-    path.addEventListener('mouseenter', () => setActive(d.type));
-    path.addEventListener('mouseleave', () => setActive(null));
-    path.addEventListener('click', () => setActive(activeType === d.type ? null : d.type));
+function buildPie(active){
+  const svg=document.getElementById('pie-svg'); svg.innerHTML='';
+  const cx=110,cy=110,r=82,ir=44; let angle=-Math.PI/2;
+  PIE_DATA.forEach(d=>{
+    const frac=d.count/TOTAL,start=angle,end=angle+frac*2*Math.PI; angle=end;
+    const mid=(start+end)/2,isAct=active===d.type;
+    const outerR=isAct?r+10:r,ox=isAct?Math.cos(mid)*6:0,oy=isAct?Math.sin(mid)*6:0;
+    const largeArc=frac>0.5?1:0;
+    const pt=(rad,a)=>[cx+ox+rad*Math.cos(a),cy+oy+rad*Math.sin(a)];
+    const [x1,y1]=pt(outerR,start),[x2,y2]=pt(outerR,end);
+    const [ix1,iy1]=pt(ir,start),[ix2,iy2]=pt(ir,end);
+    const pd=`M ${ix1} ${iy1} L ${x1} ${y1} A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${ir} ${ir} 0 ${largeArc} 0 ${ix1} ${iy1} Z`;
+    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d',pd); path.setAttribute('fill',d.color);
+    path.setAttribute('stroke','#0d1520'); path.setAttribute('stroke-width','1.5');
+    path.style.cursor='pointer'; path.style.transition='all 0.25s cubic-bezier(.34,1.56,.64,1)';
+    path.style.filter=isAct?`drop-shadow(0 3px 10px ${d.color}99)`:'none';
+    path.addEventListener('mouseenter',()=>setActive(d.type));
+    path.addEventListener('mouseleave',()=>setActive(null));
+    path.addEventListener('click',()=>setActive(activeType===d.type?null:d.type));
     svg.appendChild(path);
   });
-
-  // Center text
-  const makeText = (txt, y, size, fill, weight) => {
-    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    t.setAttribute('x', cx); t.setAttribute('y', y);
-    t.setAttribute('text-anchor', 'middle');
-    t.setAttribute('fill', fill);
-    t.style.fontSize = size + 'px';
-    t.style.fontWeight = weight;
-    t.style.fontFamily = "'Playfair Display', serif";
-    t.textContent = txt;
-    svg.appendChild(t);
+  const mt=(txt,y,sz,fill,w,fam)=>{
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',cx);t.setAttribute('y',y);t.setAttribute('text-anchor','middle');
+    t.setAttribute('fill',fill);t.style.fontSize=sz+'px';t.style.fontWeight=w;
+    t.style.fontFamily=fam||"'Playfair Display',serif";t.textContent=txt;svg.appendChild(t);
   };
-  makeText(TOTAL, cy + 8, 28, '#e8edf2', 700);
-
-  const sub = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-  sub.setAttribute('x', cx); sub.setAttribute('y', cy + 26);
-  sub.setAttribute('text-anchor', 'middle');
-  sub.setAttribute('fill', '#7a8fa0');
-  sub.style.fontSize = '10px';
-  sub.style.fontFamily = "'DM Sans', sans-serif";
-  sub.style.letterSpacing = '1.5px';
-  sub.textContent = 'BILLS';
-  svg.appendChild(sub);
+  mt(active?PIE_DATA.find(d=>d.type===active).count:TOTAL,cy+8,28,'#e8edf2',700);
+  mt('BILLS',cy+26,10,'#7a8fa0',400,"'DM Sans',sans-serif");
 }
 
-// ── Legend ───────────────────────────────────────────────────────────
-function buildLegend(active) {
-  const el = document.getElementById('legend');
-  el.innerHTML = '';
-  PIE_DATA.forEach(d => {
-    const meta = TYPE_META[d.type];
-    const isAct = active === d.type;
-    const item = document.createElement('div');
-    item.className = 'legend-item';
-    item.style.background = isAct ? meta.bg : 'transparent';
-    item.style.borderColor = isAct ? meta.color + '55' : 'transparent';
-
-    item.innerHTML = `
-      <div class="legend-dot" style="background:${d.color}"></div>
-      <div style="flex:1">
-        <div class="legend-label" style="color:${isAct ? '#e8edf2' : '#a0b8cc'}">${meta.label}</div>
-        <div class="legend-sub">${d.count} bill${d.count !== 1 ? 's' : ''} · ${Math.round(d.count/TOTAL*100)}%</div>
-      </div>
-      <span class="legend-count" style="color:${d.color}">${d.count}</span>
-    `;
-    item.addEventListener('mouseenter', () => setActive(d.type));
-    item.addEventListener('mouseleave', () => setActive(null));
-    item.addEventListener('click', () => setActive(activeType === d.type ? null : d.type));
+function buildLegend(active){
+  const el=document.getElementById('legend'); el.innerHTML='';
+  PIE_DATA.forEach(d=>{
+    const meta=TYPE_META[d.type],isAct=active===d.type;
+    const item=document.createElement('div'); item.className='legend-item';
+    item.style.background=isAct?meta.bg:'transparent';
+    item.style.borderColor=isAct?meta.color+'55':'transparent';
+    item.innerHTML=`<div class="legend-dot" style="background:${d.color}"></div>
+      <div style="flex:1"><div class="legend-label" style="color:${isAct?'#e8edf2':'#a0b8cc'}">${meta.label}</div>
+      <div class="legend-sub">${d.count} bills · ${Math.round(d.count/TOTAL*100)}%</div></div>
+      <span class="legend-count" style="color:${d.color}">${d.count}</span>`;
+    item.addEventListener('mouseenter',()=>setActive(d.type));
+    item.addEventListener('mouseleave',()=>setActive(null));
+    item.addEventListener('click',()=>setActive(activeType===d.type?null:d.type));
     el.appendChild(item);
   });
 }
 
-// ── Filter badge ─────────────────────────────────────────────────────
-function buildBadge(active) {
-  const el = document.getElementById('filter-badge');
-  if (!active) { el.innerHTML = ''; return; }
-  const meta = TYPE_META[active];
-  const count = BILLS.filter(b => b.type === active).length;
-  el.innerHTML = `
-    <span class="badge" style="color:${meta.color};background:${meta.bg};border-color:${meta.color}44">
-      Showing: ${meta.label} &middot; ${count} bill${count !== 1 ? 's' : ''}
-      &nbsp;&middot;&nbsp;
-      <span class="clear" id="clear-filter">clear filter</span>
-    </span>`;
-  document.getElementById('clear-filter').addEventListener('click', () => setActive(null));
+function buildBadge(active){
+  const el=document.getElementById('filter-badge');
+  if(!active){el.innerHTML='';return;}
+  const meta=TYPE_META[active],count=BILLS.filter(b=>b.type===active).length;
+  el.innerHTML=`<span class="badge" style="color:${meta.color};background:${meta.bg};border-color:${meta.color}44">
+    Showing: ${meta.label} &middot; ${count} bills
+    &nbsp;&middot;&nbsp;<span class="clear" id="clear-filter">clear filter</span></span>`;
+  document.getElementById('clear-filter').addEventListener('click',()=>setActive(null));
 }
 
-// ── Bill cards ───────────────────────────────────────────────────────
-function buildCards(active) {
-  const el = document.getElementById('bill-list');
-  el.innerHTML = '';
-  BILLS.forEach(bill => {
-    const meta = TYPE_META[bill.type];
-    const highlighted = !active || bill.type === active;
-    const card = document.createElement('div');
-    card.className = 'bill-card' + (highlighted ? '' : ' dimmed');
-    card.style.borderLeftColor = meta.color;
-    card.style.borderTopColor = highlighted ? meta.color + '55' : '#1e3045';
-    card.style.borderRightColor = highlighted ? meta.color + '55' : '#1e3045';
-    card.style.borderBottomColor = highlighted ? meta.color + '55' : '#1e3045';
-    card.style.background = highlighted ? meta.bg : '#121e2b';
-
-    card.innerHTML = `
+function buildCards(active){
+  const el=document.getElementById('bill-list'); el.innerHTML='';
+  const pbpC={green:'pbp-green',red:'pbp-red',orange:'pbp-orange'};
+  const pbpL={green:'✓ Favorable',red:'✗ Unfavorable',orange:'~ Neutral'};
+  BILLS.forEach(bill=>{
+    const meta=TYPE_META[bill.type],h=!active||bill.type===active;
+    const card=document.createElement('div');
+    card.className='bill-card'+(h?'':' dimmed');
+    card.style.borderLeftColor=meta.color;
+    card.style.borderTopColor=h?meta.color+'55':'#1e3045';
+    card.style.borderRightColor=h?meta.color+'55':'#1e3045';
+    card.style.borderBottomColor=h?meta.color+'55':'#1e3045';
+    card.style.background=h?meta.bg:'#121e2b';
+    card.innerHTML=`
       <div class="card-top">
         <div class="card-tags">
           <span class="tag" style="color:${meta.color};background:${meta.bg}">${bill.num}</span>
           <span class="tag-sm" style="color:#7a8fa0;background:#1a2d3e">${bill.chamber}</span>
           <span class="tag-sm" style="color:${meta.color};background:${meta.bg}">${meta.label}</span>
+          <span class="pbp-badge ${pbpC[bill.pbp]}">${pbpL[bill.pbp]}</span>
         </div>
         <div class="card-links">
-          <a href="${bill.legiscanUrl}" target="_blank" rel="noopener noreferrer" class="btn-link btn-legiscan">LegiScan ↗</a>
-          <a href="${bill.pdfUrl}" target="_blank" rel="noopener noreferrer" class="btn-link btn-pdf">PDF ↗</a>
+          <a href="${bill.pdfUrl}" target="_blank" rel="noopener noreferrer" class="btn-link btn-text">Bill Text ↗</a>
         </div>
       </div>
       <div class="card-title">${bill.title}</div>
       <div class="card-desc">${bill.desc}</div>
+      <div class="card-changes">${bill.changes}</div>
       <div class="card-meta">
         <span><em>Introduced </em>${bill.introduced}</span>
         <span><em>Status </em>${bill.status}</span>
         <span><em>Sponsor </em>${bill.sponsor}</span>
-      </div>
-    `;
+      </div>`;
     el.appendChild(card);
   });
 }
 
-// ── State update ─────────────────────────────────────────────────────
-function setActive(type) {
-  activeType = type;
-  buildPie(type);
-  buildLegend(type);
-  buildBadge(type);
-  buildCards(type);
+function setActive(type){
+  activeType=type;
+  buildPie(type); buildLegend(type); buildBadge(type); buildCards(type);
 }
-
-// ── Init ─────────────────────────────────────────────────────────────
 setActive(null);
 </script>
 </body>
