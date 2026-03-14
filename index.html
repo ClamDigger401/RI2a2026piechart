@@ -81,6 +81,15 @@
   <div class="eyebrow">Rhode Island · 2026 Session</div>
   <h1>Firearms Legislation</h1>
   <p class="subtitle">38 confirmed bills · January–March 2026</p>
+
+  <!-- Live letter counter badge -->
+  <div id="letter-counter-badge" aria-live="polite" style="
+    display:none; align-items:center; justify-content:center;
+    gap:0; flex-wrap:wrap; text-align:center;
+    background:#121e2b; border:1px solid #2eab7a33;
+    border-radius:10px; padding:12px 24px; margin:0 auto 8px;
+    max-width:420px;">
+  </div>
   <p class="source-credit">Source: <a href="https://parabellumprovisions.com" target="_blank" rel="noopener">Para Bellum Provisions</a> · Bill text links go to official RI Legislature · Color badges reflect Para Bellum's assessment</p>
   <!-- Write to Legislators button -->
   <div style="text-align:center; margin-bottom:28px;">
@@ -283,6 +292,25 @@ function setActive(type){
   buildPie(type); buildLegend(type); buildBadge(type); buildCards(type);
 }
 setActive(null);
+
+// ── LETTER COUNTER BADGE ─────────────────────────────────────────────
+async function loadCounter() {
+  try {
+    const res = await fetch("/.netlify/functions/counter");
+    if (!res.ok) return;
+    const data = await res.json();
+    const el = document.getElementById('letter-counter-badge');
+    if (el && (data.letters || 0) > 0) {
+      el.innerHTML = `
+        <span style="font-size:22px;font-weight:700;color:#2eab7a">${data.letters.toLocaleString()}</span>
+        <span style="font-size:11px;color:#566778;margin-left:4px">letters sent to</span>
+        <span style="font-size:22px;font-weight:700;color:#2eab7a;margin-left:4px">${data.recipients.toLocaleString()}</span>
+        <span style="font-size:11px;color:#566778;margin-left:4px">legislators so far</span>`;
+      el.style.display = 'flex';
+    }
+  } catch (e) { /* non-critical */ }
+}
+loadCounter();
 </script>
 </body>
 </html>

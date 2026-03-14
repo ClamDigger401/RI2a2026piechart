@@ -157,6 +157,13 @@
     <div class="eyebrow" aria-hidden="true">Rhode Island · 2026 Session</div>
     <h1>Write to Your Legislators</h1>
     <p class="subtitle">Personalized letters sent directly to your representatives, senators, and bill sponsors</p>
+  <div id="letter-counter-badge" aria-live="polite" style="
+    display:none; align-items:center; justify-content:center;
+    gap:0; flex-wrap:wrap; text-align:center;
+    background:#121e2b; border:1px solid #2eab7a33;
+    border-radius:10px; padding:12px 24px; margin:0 auto 28px;
+    max-width:420px;">
+  </div>
   </header>
 
   <!-- STEP 1: User Info -->
@@ -853,6 +860,8 @@ async function sendLetterDirect(billNum, recipients, text, firstName, lastName, 
     const err = await res.json().catch(() => ({}));
     throw new Error(`Send error ${res.status}: ${JSON.stringify(err).substring(0,100)}`);
   }
+  // Increment counter (fire and forget)
+  incrementCounter(1, recipients.length);
 }
 
 function renderSentConfirmation(bill, stance, recipients) {
@@ -910,12 +919,46 @@ async function sendLetter(billNum) {
 
     if (res.status === 202) {
       statusEl.innerHTML = `<span style="color:#2eab7a">✓ Sent to ${recipients.length} legislator${recipients.length!==1?'s':''}!</span>`;
+      incrementCounter(1, recipients.length);
     } else {
       const err = await res.json().catch(() => ({}));
       statusEl.innerHTML = `<span style="color:#e74c3c">Error ${res.status}: ${JSON.stringify(err).substring(0,100)}</span>`;
     }
   } catch(e) {
     statusEl.innerHTML = `<span style="color:#e74c3c">Network error: ${e.message}</span>`;
+  }
+}
+
+// ── LETTER COUNTER ───────────────────────────────────────────────────
+async function incrementCounter(letters, recipients) {
+  try {
+    await fetch("/.netlify/functions/counter", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ letters, recipients }),
+    });
+  } catch (e) {
+    // Non-critical — don't block sending if counter fails
+    console.warn("Counter update failed:", e.message);
+  }
+}
+
+async function loadCounter() {
+  try {
+    const res = await fetch("/.netlify/functions/counter");
+    if (!res.ok) return;
+    const data = await res.json();
+    const el = document.getElementById('letter-counter-badge');
+    if (el && (data.letters || 0) > 0) {
+      el.innerHTML = `
+        <span style="font-size:22px;font-weight:700;color:#2eab7a">${data.letters.toLocaleString()}</span>
+        <span style="font-size:11px;color:#566778;margin-left:4px">letters sent to</span>
+        <span style="font-size:22px;font-weight:700;color:#2eab7a;margin-left:4px">${data.recipients.toLocaleString()}</span>
+        <span style="font-size:11px;color:#566778;margin-left:4px">legislators</span>`;
+      el.style.display = 'flex';
+    }
+  } catch (e) {
+    // Non-critical
   }
 }
 
@@ -928,6 +971,7 @@ function showStatus(type, msg) {
 }
 
 init();
+loadCounter();
 </script>
 </body>
 </html>
