@@ -252,13 +252,27 @@
     <h2 id="step3-heading">Compose &amp; Send Letters</h2>
     <p id="step3-desc" style="font-size:12px;color:#566778;margin-bottom:16px;">A personalized letter will be composed for each selected bill addressed to the relevant legislators. Review and edit before sending, or send directly.</p>
     <div id="statusBar" class="status-bar" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Authorization checkbox -->
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:14px 16px;background:#0d1520;border:1px solid #2a3d50;border-radius:8px;margin-bottom:16px;">
+      <input type="checkbox" id="authConsent" style="width:16px;height:16px;margin-top:2px;flex-shrink:0;accent-color:#2eab7a;"
+        onchange="document.getElementById('generateBtnReview').disabled = !this.checked;
+                  document.getElementById('generateBtnSend').disabled = !this.checked;"
+        aria-describedby="consent-text" />
+      <label for="authConsent" id="consent-text" style="font-size:12px;color:#8fa8bc;line-height:1.6;cursor:pointer;">
+        I confirm that these letters are being sent on my behalf as a Rhode Island constituent.
+        I understand and authorize the submission of these letters to my elected representatives
+        in my name using the information I have provided above.
+      </label>
+    </div>
+
     <div style="display:flex;gap:12px;flex-wrap:wrap;">
       <button class="btn btn-secondary" onclick="generateLetters('review')" id="generateBtnReview"
-        aria-describedby="step3-desc">
+        disabled aria-describedby="step3-desc">
         ✎ Review &amp; Edit
       </button>
       <button class="btn btn-primary" onclick="generateLetters('send')" id="generateBtnSend"
-        aria-describedby="step3-desc">
+        disabled aria-describedby="step3-desc">
         &#9658; Send Without Review
       </button>
     </div>
