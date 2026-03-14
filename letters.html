@@ -576,15 +576,23 @@ function init() {
 }
 
 // ── CHECK GROUP ───────────────────────────────────────────────────────
+function pbpStance(bill) {
+  // Para Bellum recommended stance: red = oppose, green/orange = support
+  return bill.pbp === 'red' ? 'oppose' : 'support';
+}
+
 function checkGroup(group) {
   BILLS.forEach(bill => {
     const chk = document.getElementById(`chk-${bill.num}`);
     if (!chk) return;
     const matches = group === 'all' || group === bill.pbp;
     const shouldCheck = group !== 'none' && matches;
-    if (shouldCheck && !chk.checked) {
+    if (shouldCheck) {
+      // Check it and always apply PBP-recommended stance
       chk.checked = true;
-      toggleBill(bill.num, true);
+      const stanceDiv = document.getElementById(`stance-${bill.num}`);
+      stanceDiv.classList.remove('hidden');
+      setStance(bill.num, pbpStance(bill));
     } else if (!shouldCheck && chk.checked) {
       chk.checked = false;
       toggleBill(bill.num, false);
@@ -597,10 +605,9 @@ function toggleBill(num, checked) {
   const row = document.getElementById(`bill-row-${num}`);
   if (checked) {
     stanceDiv.classList.remove('hidden');
-    // Default stance based on PBP color
+    // Always default to Para Bellum recommended stance
     const bill = BILLS.find(b => b.num === num);
-    const defaultStance = bill.pbp === 'red' ? 'oppose' : 'support';
-    setStance(num, defaultStance);
+    setStance(num, pbpStance(bill));
   } else {
     stanceDiv.classList.add('hidden');
     delete selectedBills[num];
