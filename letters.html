@@ -107,67 +107,114 @@
     .note strong { color:#4a9fd4; }
     .hidden { display:none; }
     @media(max-width:600px) { .field-row { grid-template-columns:1fr; } }
+
+    /* Skip links */
+    .skip-links { position:absolute; top:0; left:0; z-index:9999; }
+    .skip-link {
+      position:absolute; top:-100px; left:8px;
+      background:#2eab7a; color:#fff; font-size:13px; font-weight:600;
+      padding:8px 16px; border-radius:0 0 6px 6px; text-decoration:none;
+      transition:top 0.15s;
+    }
+    .skip-link:focus { top:0; outline:3px solid #fff; outline-offset:2px; }
+
+    /* Focus styles — visible for all interactive elements */
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    [tabindex]:focus-visible {
+      outline: 3px solid #2eab7a;
+      outline-offset: 3px;
+    }
+    input:focus, textarea:focus { border-color:#4a9fd4; outline:none; box-shadow:0 0 0 3px rgba(74,159,212,0.25); }
+
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+      .bill-check { border-color: #fff; }
+      .step { border-color: #fff; }
+      label { color: #e8edf2; }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+      .spinner { border-top-color: currentColor; animation: none; }
+    }
   </style>
 </head>
 <body>
+<!-- Skip navigation links -->
+<nav class="skip-links" aria-label="Skip navigation">
+  <a class="skip-link" href="#step1">Skip to Step 1: Your Information</a>
+  <a class="skip-link" href="#step2">Skip to Step 2: Select Bills</a>
+  <a class="skip-link" href="#step3">Skip to Step 3: Send Letters</a>
+</nav>
+
+<main id="main-content">
 <div class="wrap">
-  <div class="eyebrow">Rhode Island · 2026 Session</div>
-  <h1>Write to Your Legislators</h1>
-  <p class="subtitle">Personalized letters sent directly to your representatives, senators, and bill sponsors</p>
+  <header>
+    <div class="eyebrow" aria-hidden="true">Rhode Island · 2026 Session</div>
+    <h1>Write to Your Legislators</h1>
+    <p class="subtitle">Personalized letters sent directly to your representatives, senators, and bill sponsors</p>
+  </header>
 
   <!-- STEP 1: User Info -->
-  <div class="step">
-    <div class="step-num">STEP 1</div>
-    <h2>Your Information</h2>
+  <section class="step" id="step1" aria-labelledby="step1-heading">
+    <div class="step-num" aria-hidden="true">STEP 1</div>
+    <h2 id="step1-heading">Your Information</h2>
     <div class="field-row">
       <div>
-        <label>First Name</label>
-        <input type="text" id="firstName" placeholder="Jane" />
+        <label for="firstName">First Name</label>
+        <input type="text" id="firstName" placeholder="Jane" autocomplete="given-name" required aria-required="true" />
       </div>
       <div>
-        <label>Last Name</label>
-        <input type="text" id="lastName" placeholder="Smith" />
+        <label for="lastName">Last Name</label>
+        <input type="text" id="lastName" placeholder="Smith" autocomplete="family-name" required aria-required="true" />
       </div>
     </div>
     <div class="field-row">
       <div>
-        <label>Your Email</label>
-        <input type="email" id="userEmail" placeholder="jane@example.com" />
+        <label for="userEmail">Your Email</label>
+        <input type="email" id="userEmail" placeholder="jane@example.com" autocomplete="email" required aria-required="true" />
       </div>
       <div>
-        <label>Town / City</label>
-        <input type="text" id="town" placeholder="East Greenwich" />
+        <label for="town">Town / City</label>
+        <input type="text" id="town" placeholder="East Greenwich" autocomplete="address-level2" required aria-required="true" />
       </div>
     </div>
     <div class="field-row">
       <div>
-        <label>ZIP Code (to find your legislators)</label>
-        <input type="text" id="zipCode" placeholder="02818" maxlength="5" />
+        <label for="zipCode">ZIP Code <span style="font-weight:400;color:#566778;">(to find your legislators)</span></label>
+        <input type="text" id="zipCode" placeholder="02818" maxlength="5" autocomplete="postal-code"
+          inputmode="numeric" pattern="[0-9]{5}" aria-describedby="zip-hint" />
+        <span id="zip-hint" style="font-size:10px;color:#566778;margin-top:4px;display:block;">Enter your 5-digit Rhode Island ZIP code</span>
       </div>
       <div style="display:flex;align-items:flex-end;">
-        <button class="btn btn-secondary" onclick="lookupLegislators()" id="lookupBtn">Find My Legislators</button>
+        <button class="btn btn-secondary" onclick="lookupLegislators()" id="lookupBtn"
+          aria-describedby="zip-hint">Find My Legislators</button>
       </div>
     </div>
-    <div id="legislatorResult" class="hidden" style="margin-top:14px;">
-      <h3>Your Legislators</h3>
-      <div id="legislatorTags" class="recipient-tags"></div>
+    <div id="legislatorResult" class="hidden" style="margin-top:14px;" aria-live="polite" aria-atomic="true">
+      <h3 id="legislator-heading">Your Legislators</h3>
+      <div id="legislatorTags" class="recipient-tags" role="list" aria-labelledby="legislator-heading"></div>
     </div>
-  </div>
+  </section>
 
   <!-- STEP 2: Select Bills -->
-  <div class="step">
-    <div class="step-num">STEP 2</div>
-    <h2>Select Bills &amp; Your Stance</h2>
+  <section class="step" id="step2" aria-labelledby="step2-heading">
+    <div class="step-num" aria-hidden="true">STEP 2</div>
+    <h2 id="step2-heading">Select Bills &amp; Your Stance</h2>
     <p style="font-size:12px;color:#566778;margin-bottom:16px;">Bills grouped by Para Bellum Provisions&#39; assessment. Choose support or oppose for each selected bill.</p>
 
     <!-- Check-all bar -->
     <div class="check-all-bar">
       <span>Quick select:</span>
-      <button class="gcb gcb-all"    onclick="checkGroup('all')">&#10003; All Bills</button>
-      <button class="gcb gcb-red"    onclick="checkGroup('red')">&#10007; Unfavorable Only</button>
-      <button class="gcb gcb-green"  onclick="checkGroup('green')">&#10003; Favorable Only</button>
-      <button class="gcb gcb-orange" onclick="checkGroup('orange')">~ Neutral Only</button>
-      <button class="gcb gcb-none"   onclick="checkGroup('none')">&#10005; Clear All</button>
+      <button class="gcb gcb-all"    onclick="checkGroup('all')"    aria-label="Select all bills">&#10003; All Bills</button>
+      <button class="gcb gcb-red"    onclick="checkGroup('red')"    aria-label="Select unfavorable bills only">&#10007; Unfavorable Only</button>
+      <button class="gcb gcb-green"  onclick="checkGroup('green')"  aria-label="Select favorable bills only">&#10003; Favorable Only</button>
+      <button class="gcb gcb-orange" onclick="checkGroup('orange')" aria-label="Select neutral bills only">~ Neutral Only</button>
+      <button class="gcb gcb-none"   onclick="checkGroup('none')"   aria-label="Clear all selections">&#10005; Clear All</button>
     </div>
 
     <div class="group-header">
@@ -175,42 +222,43 @@
       <div class="group-line" style="background:#c0392b33;"></div>
       <button class="group-check-all" style="border-color:#c0392b44;color:#e74c3c;" onclick="checkGroup('red')">Select All</button>
     </div>
-    <div id="billList-red"></div>
+    <div id="billList-red" role="group" aria-label="Unfavorable bills"></div>
 
     <div class="group-header">
       <div class="group-label" style="background:#1a4a2a;color:#2eab7a;">&#10003; Favorable &#8212; Para Bellum Supports</div>
       <div class="group-line" style="background:#2eab7a33;"></div>
       <button class="group-check-all" style="border-color:#2eab7a44;color:#2eab7a;" onclick="checkGroup('green')">Select All</button>
     </div>
-    <div id="billList-green"></div>
+    <div id="billList-green" role="group" aria-label="Favorable bills"></div>
 
     <div class="group-header">
       <div class="group-label" style="background:#3a2e1a;color:#e8a838;">~ Neutral &#8212; Para Bellum No Stance</div>
       <div class="group-line" style="background:#e8a83833;"></div>
       <button class="group-check-all" style="border-color:#e8a83844;color:#e8a838;" onclick="checkGroup('orange')">Select All</button>
     </div>
-    <div id="billList-orange"></div>
-  </div>
-
+    <div id="billList-orange" role="group" aria-label="Neutral bills"></div>
+  </section>
 
   <!-- STEP 3: Generate -->
-  <div class="step">
-    <div class="step-num">STEP 3</div>
-    <h2>Compose &amp; Send Letters</h2>
-    <p style="font-size:12px;color:#566778;margin-bottom:16px;">A personalized letter will be composed for each selected bill addressed to the relevant legislators. Review and edit before sending, or send directly.</p>
-    <div id="statusBar" class="status-bar"></div>
+  <section class="step" id="step3" aria-labelledby="step3-heading">
+    <div class="step-num" aria-hidden="true">STEP 3</div>
+    <h2 id="step3-heading">Compose &amp; Send Letters</h2>
+    <p id="step3-desc" style="font-size:12px;color:#566778;margin-bottom:16px;">A personalized letter will be composed for each selected bill addressed to the relevant legislators. Review and edit before sending, or send directly.</p>
+    <div id="statusBar" class="status-bar" role="status" aria-live="polite" aria-atomic="true"></div>
     <div style="display:flex;gap:12px;flex-wrap:wrap;">
-      <button class="btn btn-secondary" onclick="generateLetters('review')" id="generateBtnReview">
+      <button class="btn btn-secondary" onclick="generateLetters('review')" id="generateBtnReview"
+        aria-describedby="step3-desc">
         ✎ Review &amp; Edit
       </button>
-      <button class="btn btn-primary" onclick="generateLetters('send')" id="generateBtnSend">
+      <button class="btn btn-primary" onclick="generateLetters('send')" id="generateBtnSend"
+        aria-describedby="step3-desc">
         &#9658; Send Without Review
       </button>
     </div>
-    <div id="lettersContainer" style="margin-top:20px;"></div>
-  </div>
+    <div id="lettersContainer" style="margin-top:20px;" aria-live="polite" aria-label="Generated letters"></div>
+  </section>
 
-  <div class="note">
+  <div class="note" role="note">
     <strong>Privacy: </strong>Your name and email are used only to address your letters and send them to legislators. They are not stored or shared.
     Letters are sent via SendGrid to official RI Legislature email addresses (rilin.state.ri.us).
     API keys are stored securely in Netlify Environment Variables — not in this file.
@@ -219,6 +267,7 @@
     <a href="index.html">← Back to bill tracker</a>
   </p>
 </div>
+</main>
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────
@@ -475,23 +524,32 @@ let generatedLetters = {}; // { billNum: { recipients:[...], text:'' } }
 // ── INIT ──────────────────────────────────────────────────────────────
 function makeBillRow(bill) {
   const pbpColors = {green:'pbp-green', red:'pbp-red', orange:'pbp-orange'};
-  const pbpLabels = {green:'✓ Favorable', red:'✗ Unfavorable', orange:'~ Neutral'};
+  const pbpLabels = {green:'Favorable', red:'Unfavorable', orange:'Neutral'};
+  const pbpSymbols = {green:'✓', red:'✗', orange:'~'};
   const div = document.createElement('div');
   div.className = 'bill-check';
   div.id = `bill-row-${bill.num}`;
+  div.setAttribute('role', 'listitem');
   div.innerHTML = `
-    <input type="checkbox" id="chk-${bill.num}" onchange="toggleBill('${bill.num}', this.checked)" />
+    <input type="checkbox" id="chk-${bill.num}"
+      aria-label="${bill.num}: ${bill.title}"
+      aria-describedby="desc-${bill.num}"
+      onchange="toggleBill('${bill.num}', this.checked)" />
     <div class="bill-info">
       <div>
-        <span class="bill-num" style="color:${bill.pbp==='red'?'#e74c3c':bill.pbp==='green'?'#2eab7a':'#e8a838'}">${bill.num}</span>
-        <span style="font-size:10px;color:#566778;margin-left:6px">${bill.chamber}</span>
-        <span class="pbp ${pbpColors[bill.pbp]}">${pbpLabels[bill.pbp]}</span>
+        <label for="chk-${bill.num}" class="bill-num" style="color:${bill.pbp==='red'?'#e74c3c':bill.pbp==='green'?'#2eab7a':'#e8a838'};cursor:pointer;">${bill.num}</label>
+        <span style="font-size:10px;color:#566778;margin-left:6px" aria-label="${bill.chamber} bill">${bill.chamber}</span>
+        <span class="pbp ${pbpColors[bill.pbp]}" aria-label="Para Bellum assessment: ${pbpLabels[bill.pbp]}">${pbpSymbols[bill.pbp]} ${pbpLabels[bill.pbp]}</span>
       </div>
-      <div class="bill-title-sm">${bill.title}</div>
+      <div class="bill-title-sm" id="desc-${bill.num}">${bill.title}</div>
       <div class="bill-desc-sm">${bill.desc}</div>
-      <div class="stance-toggle hidden" id="stance-${bill.num}">
-        <button class="stance-btn stance-support" id="support-${bill.num}" onclick="setStance('${bill.num}','support')">✓ Support</button>
-        <button class="stance-btn stance-oppose" id="oppose-${bill.num}" onclick="setStance('${bill.num}','oppose')">✗ Oppose</button>
+      <div class="stance-toggle hidden" id="stance-${bill.num}" role="group" aria-label="Your stance on ${bill.num}">
+        <button class="stance-btn stance-support" id="support-${bill.num}"
+          aria-pressed="false"
+          onclick="setStance('${bill.num}','support')">✓ Support</button>
+        <button class="stance-btn stance-oppose" id="oppose-${bill.num}"
+          aria-pressed="false"
+          onclick="setStance('${bill.num}','oppose')">✗ Oppose</button>
       </div>
     </div>`;
   return div;
@@ -503,6 +561,7 @@ function init() {
     green:  document.getElementById('billList-green'),
     orange: document.getElementById('billList-orange'),
   };
+  Object.values(containers).forEach(c => c && c.setAttribute('role','list'));
   BILLS.forEach(bill => {
     const target = containers[bill.pbp] || containers.orange;
     target.appendChild(makeBillRow(bill));
@@ -546,8 +605,12 @@ function setStance(num, stance) {
   selectedBills[num] = stance;
   const row = document.getElementById(`bill-row-${num}`);
   row.className = `bill-check selected-${stance}`;
-  document.getElementById(`support-${num}`).className = `stance-btn stance-support${stance==='support'?' active':''}`;
-  document.getElementById(`oppose-${num}`).className  = `stance-btn stance-oppose${stance==='oppose'?' active':''}`;
+  const supportBtn = document.getElementById(`support-${num}`);
+  const opposeBtn  = document.getElementById(`oppose-${num}`);
+  supportBtn.className = `stance-btn stance-support${stance==='support'?' active':''}`;
+  opposeBtn.className  = `stance-btn stance-oppose${stance==='oppose'?' active':''}`;
+  supportBtn.setAttribute('aria-pressed', stance === 'support' ? 'true' : 'false');
+  opposeBtn.setAttribute('aria-pressed',  stance === 'oppose'  ? 'true' : 'false');
 }
 
 // ── LEGISLATOR LOOKUP ─────────────────────────────────────────────────
