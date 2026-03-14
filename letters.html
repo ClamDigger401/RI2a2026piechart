@@ -622,6 +622,16 @@ async function generateLetters(mode) {
       }
     });
 
+    // Always include Judiciary committee inboxes
+    const COMMITTEE_EMAILS = bill.chamber === 'House'
+      ? [{ name: "House Judiciary Committee", email: "HouseJudiciary@rilegislature.gov" }]
+      : [{ name: "Senate Judiciary Committee", email: "slegislation@rilegislature.gov" }];
+    COMMITTEE_EMAILS.forEach(c => {
+      if (!allRecipients.find(r => r.email === c.email)) {
+        allRecipients.push(c);
+      }
+    });
+
     try {
       const letterText = await generateOneLetter(firstName, lastName, town, bill, stance, allRecipients);
       generatedLetters[billNum] = { recipients: allRecipients, text: letterText };
