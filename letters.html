@@ -284,9 +284,19 @@
     Letters are sent via SendGrid to official RI Legislature email addresses (rilin.state.ri.us).
     API keys are stored securely in Netlify Environment Variables — not in this file.
   </div>
-  <p style="text-align:center;margin-top:20px;font-size:11px;color:#3a5060;">
-    <a href="index.html">← Back to bill tracker</a>
-  </p>
+
+  <!-- Disclaimer footer -->
+  <footer style="margin-top:40px;padding:20px 0;border-top:1px solid #1e3045;">
+    <p style="font-size:11px;color:#3a5060;line-height:1.8;text-align:center;max-width:700px;margin:0 auto;">
+      <strong style="color:#4a6070;">Disclaimer:</strong>
+      This tool is an independent civic advocacy platform and is not affiliated with, endorsed by, or connected to
+      Para Bellum Provisions, the Rhode Island General Assembly, or any government agency.
+      Letters are sent solely on behalf of the constituent who completes and authorizes each submission.
+      No personal information is stored by this tool.
+      Use of this tool does not constitute legal or political advice.
+      &copy; 2026 RI 2026 Legislation Facts &middot; <a href="index.html" style="color:#4a9fd4;">Back to Bill Tracker</a>
+    </p>
+  </footer>
 </div>
 </main>
 
@@ -994,12 +1004,10 @@ async function loadCounter() {
     if (!res.ok) return;
     const data = await res.json();
     const el = document.getElementById('letter-counter-badge');
-    if (el && (data.letters || 0) > 0) {
+    if (el && (data.letters || 0) > 150) {
       el.innerHTML = `
         <span style="font-size:22px;font-weight:700;color:#2eab7a">${data.letters.toLocaleString()}</span>
-        <span style="font-size:11px;color:#566778;margin-left:4px">letters sent to</span>
-        <span style="font-size:22px;font-weight:700;color:#2eab7a;margin-left:4px">${data.recipients.toLocaleString()}</span>
-        <span style="font-size:11px;color:#566778;margin-left:4px">legislators</span>`;
+        <span style="font-size:13px;color:#566778;margin-left:8px">constituent letters sent to legislators</span>`;
       el.style.display = 'flex';
     }
   } catch (e) {

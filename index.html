@@ -125,6 +125,20 @@
     Classification (Restriction / Expansion / Mixed) is editorial. All bills as of early March 2026 — session ongoing.
     Hover or tap the pie or legend to filter by type.
   </div>
+
+  <!-- Disclaimer footer -->
+  <footer style="margin-top:40px;padding:20px 0;border-top:1px solid #1e3045;">
+    <p style="font-size:11px;color:#3a5060;line-height:1.8;text-align:center;max-width:700px;margin:0 auto;">
+      <strong style="color:#4a6070;">Disclaimer:</strong>
+      This site is an independent civic advocacy tool and is not affiliated with, endorsed by, or connected to
+      Para Bellum Provisions, the Rhode Island General Assembly, or any government agency.
+      Bill data and editorial assessments are sourced from Para Bellum Provisions and the official RI Legislature website.
+      This tool does not store any personal information entered by users.
+      Letters sent through this tool are submitted on behalf of the individual constituent who authorizes each submission.
+      This tool is provided for informational and civic engagement purposes only and does not constitute legal or political advice.
+      &copy; 2026 RI 2026 Legislation Facts &middot; <a href="letters.html" style="color:#4a9fd4;">Write to Your Legislators</a>
+    </p>
+  </footer>
 </div>
 <script>
 const BILLS = [
@@ -300,12 +314,10 @@ async function loadCounter() {
     if (!res.ok) return;
     const data = await res.json();
     const el = document.getElementById('letter-counter-badge');
-    if (el && (data.letters || 0) > 0) {
+    if (el && (data.letters || 0) > 150) {
       el.innerHTML = `
         <span style="font-size:22px;font-weight:700;color:#2eab7a">${data.letters.toLocaleString()}</span>
-        <span style="font-size:11px;color:#566778;margin-left:4px">letters sent to</span>
-        <span style="font-size:22px;font-weight:700;color:#2eab7a;margin-left:4px">${data.recipients.toLocaleString()}</span>
-        <span style="font-size:11px;color:#566778;margin-left:4px">legislators so far</span>`;
+        <span style="font-size:13px;color:#566778;margin-left:8px">constituent letters sent to legislators</span>`;
       el.style.display = 'flex';
     }
   } catch (e) { /* non-critical */ }
