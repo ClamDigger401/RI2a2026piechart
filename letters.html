@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Write to Your RI Legislators — Firearms Bills 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0d1520; color: #e8edf2; font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 40px 20px 80px; }
+    a { color: #4a9fd4; }
+    .wrap { max-width: 820px; margin: 0 auto; }
+    .eyebrow { text-align:center; font-size:10px; letter-spacing:4px; color:#c0392b; text-transform:uppercase; margin-bottom:10px; }
+    h1 { font-family:'Playfair Display',serif; font-size:clamp(20px,4vw,32px); font-weight:700; text-align:center; color:#e8edf2; line-height:1.2; margin-bottom:8px; }
+    .subtitle { text-align:center; color:#566778; font-size:12.5px; margin-bottom:36px; }
+    h2 { font-family:'Playfair Display',serif; font-size:18px; color:#e8edf2; margin-bottom:16px; }
+    h3 { font-size:13px; font-weight:600; color:#a0b8cc; margin-bottom:10px; letter-spacing:0.5px; text-transform:uppercase; }
+
+    /* Steps */
+    .step { background:#121e2b; border-radius:12px; padding:24px; margin-bottom:20px; border:1px solid #1e3045; }
+    .step-num { display:inline-block; background:#c0392b; color:#fff; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; letter-spacing:1px; margin-bottom:12px; }
+
+    /* Form fields */
+    .field-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+    .field-row.single { grid-template-columns:1fr; }
+    label { display:block; font-size:11px; color:#7a8fa0; letter-spacing:1px; text-transform:uppercase; margin-bottom:5px; }
+    input, textarea { width:100%; background:#0d1520; border:1px solid #1e3045; border-radius:6px; padding:10px 12px; color:#e8edf2; font-family:'DM Sans',sans-serif; font-size:13px; outline:none; transition:border-color 0.2s; }
+    input:focus, textarea:focus { border-color:#4a9fd4; }
+    textarea { resize:vertical; min-height:120px; line-height:1.6; }
+    .btn { display:inline-block; padding:10px 22px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; border:none; transition:all 0.2s; font-family:'DM Sans',sans-serif; }
+    .btn-primary { background:#c0392b; color:#fff; }
+    .btn-primary:hover { background:#e74c3c; }
+    .btn-secondary { background:#1e3045; color:#a0b8cc; }
+    .btn-secondary:hover { background:#2a4060; color:#e8edf2; }
+    .btn-green { background:#1a4a2a; color:#2eab7a; border:1px solid #2eab7a44; }
+    .btn-green:hover { background:#2eab7a; color:#fff; }
+    .btn:disabled { opacity:0.4; cursor:not-allowed; }
+
+    /* Bill selection */
+    .bill-check { display:flex; gap:12px; align-items:flex-start; padding:12px; border-radius:8px; border:1px solid #1e3045; margin-bottom:8px; cursor:pointer; transition:all 0.2s; }
+    .bill-check:hover { border-color:#2a4060; background:#121e2b; }
+    .bill-check.selected-support { border-color:#2eab7a55; background:rgba(46,171,122,0.08); }
+    .bill-check.selected-oppose { border-color:#c0392b55; background:rgba(192,57,43,0.08); }
+    .bill-check input[type=checkbox] { width:16px; height:16px; margin-top:2px; flex-shrink:0; accent-color:#4a9fd4; }
+    .bill-info { flex:1; }
+    .bill-num { font-family:monospace; font-size:12px; font-weight:800; }
+    .bill-title-sm { font-size:12.5px; color:#d8e8f2; margin:3px 0; }
+    .bill-desc-sm { font-size:11px; color:#566778; line-height:1.5; }
+    .stance-toggle { display:flex; gap:6px; margin-top:8px; }
+    .stance-btn { font-size:10px; padding:3px 10px; border-radius:4px; cursor:pointer; border:1px solid; font-weight:600; transition:all 0.15s; font-family:'DM Sans',sans-serif; }
+    .stance-support { border-color:#2eab7a44; color:#2eab7a; background:transparent; }
+    .stance-support.active { background:#2eab7a; color:#fff; border-color:#2eab7a; }
+    .stance-oppose { border-color:#c0392b44; color:#c0392b; background:transparent; }
+    .stance-oppose.active { background:#c0392b; color:#fff; border-color:#c0392b; }
+
+    /* PBP badge */
+    .pbp { display:inline-block; font-size:9px; padding:1px 6px; border-radius:3px; font-weight:700; margin-left:6px; vertical-align:middle; }
+    .pbp-green { background:#1a4a2a; color:#2eab7a; }
+    .pbp-red { background:#3a1a1a; color:#e74c3c; }
+    .pbp-orange { background:#3a2e1a; color:#e8a838; }
+
+    /* Check-all bar */
+    .check-all-bar { display:flex; align-items:center; gap:8px; padding:10px 14px; background:#0d1520; border:1px solid #2a3d50; border-radius:8px; margin-bottom:18px; flex-wrap:wrap; }
+    .check-all-bar span { font-size:11px; color:#7a8fa0; margin-right:4px; }
+    .gcb { font-size:10px; padding:3px 10px; border-radius:4px; cursor:pointer; border:1px solid; font-weight:600; font-family:'DM Sans',sans-serif; transition:all 0.15s; background:transparent; }
+    .gcb-all   { border-color:#4a9fd455; color:#4a9fd4; }
+    .gcb-all:hover   { background:#4a9fd4; color:#fff; border-color:#4a9fd4; }
+    .gcb-none  { border-color:#566778;    color:#566778; }
+    .gcb-none:hover  { background:#566778; color:#fff; }
+    .gcb-red   { border-color:#c0392b55; color:#e74c3c; }
+    .gcb-red:hover   { background:#c0392b; color:#fff; border-color:#c0392b; }
+    .gcb-green { border-color:#2eab7a55; color:#2eab7a; }
+    .gcb-green:hover { background:#2eab7a; color:#fff; border-color:#2eab7a; }
+    .gcb-orange{ border-color:#e8a83855; color:#e8a838; }
+    .gcb-orange:hover{ background:#e8a838; color:#fff; border-color:#e8a838; }
+
+    /* Group headers */
+    .group-header { display:flex; align-items:center; gap:10px; margin:18px 0 10px; }
+    .group-line { flex:1; height:1px; }
+    .group-label { font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:3px 10px; border-radius:4px; white-space:nowrap; }
+    .group-check-all { font-size:10px; padding:2px 8px; border-radius:4px; cursor:pointer; border:1px solid; font-weight:600; font-family:'DM Sans',sans-serif; background:transparent; transition:all 0.15s; }
+
+    /* Generated letters */
+    .letter-block { background:#0d1520; border:1px solid #1e3a55; border-radius:10px; margin-bottom:16px; overflow:hidden; }
+    .letter-header { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:#121e2b; border-bottom:1px solid #1e3045; flex-wrap:wrap; gap:8px; }
+    .letter-to { font-size:12px; color:#4a9fd4; font-weight:600; }
+    .letter-body { padding:16px; }
+    .letter-body textarea { min-height:200px; font-size:12px; line-height:1.7; color:#c8d8e8; background:#0d1520; border-color:#1e3045; }
+    .letter-actions { display:flex; gap:8px; padding:12px 16px; border-top:1px solid #1e3045; flex-wrap:wrap; }
+
+    /* Recipients */
+    .recipient-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .recipient-tag { font-size:10px; padding:2px 8px; border-radius:4px; background:#1a2d3e; color:#7a8fa0; border:1px solid #2a3d50; }
+
+    /* Status */
+    .status-bar { padding:12px 16px; border-radius:8px; font-size:12.5px; margin-bottom:16px; display:none; }
+    .status-info { background:#1a2d3e; border:1px solid #2a4060; color:#4a9fd4; }
+    .status-success { background:#1a4a2a; border:1px solid #2eab7a44; color:#2eab7a; }
+    .status-error { background:#3a1a1a; border:1px solid #c0392b44; color:#e74c3c; }
+
+    /* Spinner */
+    .spinner { display:inline-block; width:14px; height:14px; border:2px solid #ffffff44; border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; margin-right:6px; vertical-align:middle; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    .note { margin-top:24px; padding:14px 18px; background:#121e2b; border-radius:8px; border-left:3px solid #1e3a55; font-size:11px; color:#4a6070; line-height:1.7; }
+    .note strong { color:#4a9fd4; }
+    .hidden { display:none; }
+    @media(max-width:600px) { .field-row { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Rhode Island · 2026 Session</div>
+  <h1>Write to Your Legislators</h1>
+  <p class="subtitle">Personalized letters sent directly to your representatives, senators, and bill sponsors</p>
+
+  <!-- STEP 1: User Info -->
+  <div class="step">
+    <div class="step-num">STEP 1</div>
+    <h2>Your Information</h2>
+    <div class="field-row">
+      <div>
+        <label>First Name</label>
+        <input type="text" id="firstName" placeholder="Jane" />
+      </div>
+      <div>
+        <label>Last Name</label>
+        <input type="text" id="lastName" placeholder="Smith" />
+      </div>
+    </div>
+    <div class="field-row">
+      <div>
+        <label>Your Email</label>
+        <input type="email" id="userEmail" placeholder="jane@example.com" />
+      </div>
+      <div>
+        <label>Town / City</label>
+        <input type="text" id="town" placeholder="East Greenwich" />
+      </div>
+    </div>
+    <div class="field-row">
+      <div>
+        <label>ZIP Code (to find your legislators)</label>
+        <input type="text" id="zipCode" placeholder="02818" maxlength="5" />
+      </div>
+      <div style="display:flex;align-items:flex-end;">
+        <button class="btn btn-secondary" onclick="lookupLegislators()" id="lookupBtn">Find My Legislators</button>
+      </div>
+    </div>
+    <div id="legislatorResult" class="hidden" style="margin-top:14px;">
+      <h3>Your Legislators</h3>
+      <div id="legislatorTags" class="recipient-tags"></div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Select Bills -->
+  <div class="step">
+    <div class="step-num">STEP 2</div>
+    <h2>Select Bills &amp; Your Stance</h2>
+    <p style="font-size:12px;color:#566778;margin-bottom:16px;">Bills grouped by Para Bellum Provisions&#39; assessment. Choose support or oppose for each selected bill.</p>
+
+    <!-- Check-all bar -->
+    <div class="check-all-bar">
+      <span>Quick select:</span>
+      <button class="gcb gcb-all"    onclick="checkGroup('all')">&#10003; All Bills</button>
+      <button class="gcb gcb-red"    onclick="checkGroup('red')">&#10007; Unfavorable Only</button>
+      <button class="gcb gcb-green"  onclick="checkGroup('green')">&#10003; Favorable Only</button>
+      <button class="gcb gcb-orange" onclick="checkGroup('orange')">~ Neutral Only</button>
+      <button class="gcb gcb-none"   onclick="checkGroup('none')">&#10005; Clear All</button>
+    </div>
+
+    <div class="group-header">
+      <div class="group-label" style="background:#3a1a1a;color:#e74c3c;">&#10007; Unfavorable &#8212; Para Bellum Opposes</div>
+      <div class="group-line" style="background:#c0392b33;"></div>
+      <button class="group-check-all" style="border-color:#c0392b44;color:#e74c3c;" onclick="checkGroup('red')">Select All</button>
+    </div>
+    <div id="billList-red"></div>
+
+    <div class="group-header">
+      <div class="group-label" style="background:#1a4a2a;color:#2eab7a;">&#10003; Favorable &#8212; Para Bellum Supports</div>
+      <div class="group-line" style="background:#2eab7a33;"></div>
+      <button class="group-check-all" style="border-color:#2eab7a44;color:#2eab7a;" onclick="checkGroup('green')">Select All</button>
+    </div>
+    <div id="billList-green"></div>
+
+    <div class="group-header">
+      <div class="group-label" style="background:#3a2e1a;color:#e8a838;">~ Neutral &#8212; Para Bellum No Stance</div>
+      <div class="group-line" style="background:#e8a83833;"></div>
+      <button class="group-check-all" style="border-color:#e8a83844;color:#e8a838;" onclick="checkGroup('orange')">Select All</button>
+    </div>
+    <div id="billList-orange"></div>
+  </div>
+
+
+  <!-- STEP 3: Generate -->
+  <div class="step">
+    <div class="step-num">STEP 3</div>
+    <h2>Compose &amp; Send Letters</h2>
+    <p style="font-size:12px;color:#566778;margin-bottom:16px;">A personalized letter will be composed for each selected bill addressed to the relevant legislators. Review and edit before sending, or send directly.</p>
+    <div id="statusBar" class="status-bar"></div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <button class="btn btn-secondary" onclick="generateLetters('review')" id="generateBtnReview">
+        ✎ Review &amp; Edit
+      </button>
+      <button class="btn btn-primary" onclick="generateLetters('send')" id="generateBtnSend">
+        &#9658; Send Without Review
+      </button>
+    </div>
+    <div id="lettersContainer" style="margin-top:20px;"></div>
+  </div>
+
+  <div class="note">
+    <strong>Privacy: </strong>Your name and email are used only to address your letters and send them to legislators. They are not stored or shared.
+    Letters are sent via SendGrid to official RI Legislature email addresses (rilin.state.ri.us).
+    <strong>SendGrid API key</strong> must be set as the variable <code>SENDGRID_KEY</code> at the top of this file's script section.
+  </div>
+  <p style="text-align:center;margin-top:20px;font-size:11px;color:#3a5060;">
+    <a href="index.html">← Back to bill tracker</a>
+  </p>
+</div>
+
+<script>
+// ── CONFIG — SET YOUR KEYS HERE ───────────────────────────────────────
+const SENDGRID_KEY   = "YOUR_SENDGRID_API_KEY";   // sg.xxxxx
+const ANTHROPIC_KEY  = "YOUR_ANTHROPIC_API_KEY";  // sk-ant-xxxxx
+const FROM_EMAIL     = "noreply@update2abills.netlify.app"; // verified sender in SendGrid
+
+// ── LEGISLATOR DATABASE ───────────────────────────────────────────────
+// Email pattern: rep-lastname@rilin.state.ri.us / sen-lastname@rilin.state.ri.us
+// Built from RI Legislature public records
+const LEGISLATORS = {
+  // HOUSE REPRESENTATIVES (by last name → email)
+  house: {
+    "Ajello":      { name:"Rep. Edith Ajello",       email:"rep-ajello@rilin.state.ri.us",      district:"Providence" },
+    "Alzate":      { name:"Rep. Karen Alzate",        email:"rep-alzate@rilin.state.ri.us",       district:"Providence" },
+    "Azzinaro":    { name:"Rep. Samuel Azzinaro",     email:"rep-azzinaro@rilin.state.ri.us",     district:"Westerly" },
+    "Batista":     { name:"Rep. Leonela Batista",     email:"rep-batista@rilin.state.ri.us",      district:"Pawtucket" },
+    "Bennett":     { name:"Rep. David Bennett",       email:"rep-bennett@rilin.state.ri.us",      district:"Warwick" },
+    "Biah":        { name:"Rep. Nathan Biah",         email:"rep-biah@rilin.state.ri.us",         district:"Providence" },
+    "Boylan":      { name:"Rep. Jennifer Boylan",     email:"rep-boylan@rilin.state.ri.us",       district:"Exeter/Richmond" },
+    "Brien":       { name:"Rep. William O'Brien",     email:"rep-obrien@rilin.state.ri.us",       district:"North Providence" },
+    "Caldwell":    { name:"Rep. Justine Caldwell",    email:"rep-caldwell@rilin.state.ri.us",     district:"East Greenwich" },
+    "Carson":      { name:"Rep. Lauren Carson",       email:"rep-carson@rilin.state.ri.us",       district:"Newport" },
+    "Casimiro":    { name:"Rep. Julie Casimiro",      email:"rep-casimiro@rilin.state.ri.us",     district:"North Kingstown" },
+    "Casey":       { name:"Rep. Stephen Casey",       email:"rep-casey@rilin.state.ri.us",        district:"Woonsocket" },
+    "Chippendale": { name:"Rep. Michael Chippendale", email:"rep-chippendale@rilin.state.ri.us",  district:"Foster/Glocester" },
+    "Cortvriend":  { name:"Rep. Terri-Denise Cortvriend", email:"rep-cortvriend@rilin.state.ri.us", district:"Portsmouth/Tiverton" },
+    "Corvese":     { name:"Rep. Arthur Corvese",      email:"rep-corvese@rilin.state.ri.us",      district:"North Providence" },
+    "Craven":      { name:"Rep. Charlene Lima",       email:"rep-lima@rilin.state.ri.us",         district:"Cranston" },
+    "Cruz":        { name:"Rep. Cherie Cruz",         email:"rep-cruz@rilin.state.ri.us",         district:"Pawtucket" },
+    "Dawson":      { name:"Rep. Matthew Dawson",      email:"rep-dawson@rilin.state.ri.us",       district:"East Providence" },
+    "Diaz":        { name:"Rep. Patricia Diaz",       email:"rep-diaz@rilin.state.ri.us",         district:"Pawtucket" },
+    "Donovan":     { name:"Rep. Susan Donovan",       email:"rep-donovan@rilin.state.ri.us",      district:"Westport/Little Compton" },
+    "Edwards":     { name:"Rep. John Edwards",        email:"rep-edwards@rilin.state.ri.us",      district:"Tiverton" },
+    "Fascia":      { name:"Rep. Richard Fascia",      email:"rep-fascia@rilin.state.ri.us",       district:"East Providence" },
+    "Fellela":     { name:"Rep. Deborah Fellela",     email:"rep-fellela@rilin.state.ri.us",      district:"Johnston" },
+    "Felix":       { name:"Rep. Enrique Felix",       email:"rep-felix@rilin.state.ri.us",        district:"Pawtucket" },
+    "Fogarty":     { name:"Rep. Kathleen Fogarty",    email:"rep-fogarty@rilin.state.ri.us",      district:"South Kingstown" },
+    "Furtado":     { name:"Rep. Jenni Furtado",       email:"rep-furtado@rilin.state.ri.us",      district:"East Providence" },
+    "Handy":       { name:"Rep. Arthur Handy",        email:"rep-handy@rilin.state.ri.us",        district:"Cranston" },
+    "Hopkins":     { name:"Rep. Marie Hopkins",       email:"rep-hopkins@rilin.state.ri.us",      district:"Scituate" },
+    "Hull":        { name:"Rep. Raymond Hull",        email:"rep-hull@rilin.state.ri.us",         district:"North Providence" },
+    "Kazarian":    { name:"Rep. Katherine Kazarian",  email:"rep-kazarian@rilin.state.ri.us",     district:"East Providence" },
+    "Kennedy":     { name:"Rep. Brian Kennedy",       email:"rep-kennedy@rilin.state.ri.us",      district:"Hopkinton" },
+    "Kislak":      { name:"Rep. Rebecca Kislak",      email:"rep-kislak@rilin.state.ri.us",       district:"Providence" },
+    "Knight":      { name:"Rep. Marvin Knight",       email:"rep-knight@rilin.state.ri.us",       district:"Barrington" },
+    "Lombardi":    { name:"Rep. John Lombardi",       email:"rep-lombardi@rilin.state.ri.us",     district:"Providence" },
+    "McEntee":     { name:"Rep. Carol McEntee",       email:"rep-mcentee@rilin.state.ri.us",      district:"South Kingstown" },
+    "McGaw":       { name:"Rep. Patricia McGaw",      email:"rep-mcgaw@rilin.state.ri.us",        district:"Smithfield" },
+    "Messier":     { name:"Rep. Mary Messier",        email:"rep-messier@rilin.state.ri.us",      district:"Woonsocket" },
+    "Morales":     { name:"Rep. Ana Morales",         email:"rep-morales@rilin.state.ri.us",      district:"Providence" },
+    "Nardone":     { name:"Rep. George Nardone",      email:"rep-nardone@rilin.state.ri.us",      district:"Coventry" },
+    "Noret":       { name:"Rep. Thomas Noret",        email:"rep-noret@rilin.state.ri.us",        district:"Coventry" },
+    "Phillips":    { name:"Rep. Robert Phillips",     email:"rep-phillips@rilin.state.ri.us",     district:"Woonsocket" },
+    "Place":       { name:"Rep. David Place",         email:"rep-place@rilin.state.ri.us",        district:"Burrillville/Glocester" },
+    "Potter":      { name:"Rep. Brandon Potter",      email:"rep-potter@rilin.state.ri.us",       district:"Cranston" },
+    "Quattrocchi": { name:"Rep. John Quattrocchi",    email:"rep-quattrocchi@rilin.state.ri.us",  district:"Coventry" },
+    "Read":        { name:"Rep. Earl Read",           email:"rep-read@rilin.state.ri.us",         district:"Rehoboth/Seekonk" },
+    "Roberts":     { name:"Rep. Jacquelyn Roberts",   email:"rep-roberts@rilin.state.ri.us",      district:"Coventry" },
+    "Sanchez":     { name:"Rep. Leonidas Sanchez",    email:"rep-sanchez@rilin.state.ri.us",      district:"Providence" },
+    "Santucci":    { name:"Rep. Paul Santucci",       email:"rep-santucci@rilin.state.ri.us",     district:"North Smithfield" },
+    "Serpa":       { name:"Rep. Patricia Serpa",      email:"rep-serpa@rilin.state.ri.us",        district:"West Warwick" },
+    "Smith":       { name:"Rep. Maryann Shallcross Smith", email:"rep-smith@rilin.state.ri.us",  district:"Bristol" },
+    "Solomon":     { name:"Rep. Justine Solomon",     email:"rep-solomon@rilin.state.ri.us",      district:"North Kingstown" },
+    "Speakman":    { name:"Rep. June Speakman",       email:"rep-speakman@rilin.state.ri.us",     district:"Warren/Bristol" },
+    "Stewart":     { name:"Rep. Jennifer Stewart",    email:"rep-stewart@rilin.state.ri.us",      district:"Barrington" },
+    "Tanzi":       { name:"Rep. Teresa Tanzi",        email:"rep-tanzi@rilin.state.ri.us",        district:"South Kingstown/Narragansett" },
+    "Voas":        { name:"Rep. Michelle Voas",       email:"rep-voas@rilin.state.ri.us",         district:"Newport" },
+  },
+  // SENATE
+  senate: {
+    "Acosta":      { name:"Sen. Jonathon Acosta",     email:"sen-acosta@rilin.state.ri.us",       district:"Central Falls/Pawtucket" },
+    "Appollonio":  { name:"Sen. Frank Appollonio",    email:"sen-appollonio@rilin.state.ri.us",   district:"Woonsocket" },
+    "Bissaillon":  { name:"Sen. Jacob Bissaillon",    email:"sen-bissaillon@rilin.state.ri.us",   district:"Warwick" },
+    "Britto":      { name:"Sen. Ana Quezada",         email:"sen-quezada@rilin.state.ri.us",      district:"Providence" },
+    "Burke":       { name:"Sen. James Burke",         email:"sen-burke@rilin.state.ri.us",        district:"East Greenwich/West Greenwich" },
+    "Ciccone":     { name:"Sen. Frank Ciccone",       email:"sen-ciccone@rilin.state.ri.us",      district:"North Providence/Providence" },
+    "de la Cruz":  { name:"Sen. Jessica de la Cruz",  email:"sen-delacruz@rilin.state.ri.us",     district:"North Smithfield/Burrillville" },
+    "DiMario":     { name:"Sen. Alana DiMario",       email:"sen-dimario@rilin.state.ri.us",      district:"North Kingstown/Narragansett" },
+    "Dimitri":     { name:"Sen. James Dimitri",       email:"sen-dimitri@rilin.state.ri.us",      district:"Lincoln/North Providence" },
+    "DiPalma":     { name:"Sen. Louis DiPalma",       email:"sen-dipalma@rilin.state.ri.us",      district:"Middletown/Little Compton/Tiverton" },
+    "Euer":        { name:"Sen. Dawn Euer",           email:"sen-euer@rilin.state.ri.us",         district:"Newport/Jamestown" },
+    "Famiglietti": { name:"Sen. Marc Famiglietti",    email:"sen-famiglietti@rilin.state.ri.us",  district:"Attleboro/Seekonk" },
+    "Felag":       { name:"Sen. Walter Felag",        email:"sen-felag@rilin.state.ri.us",        district:"Bristol/Warren" },
+    "Gallo":       { name:"Sen. Josh Gallo",          email:"sen-gallo@rilin.state.ri.us",        district:"Providence" },
+    "Gu":          { name:"Sen. Victoria Gu",         email:"sen-gu@rilin.state.ri.us",           district:"Westerly" },
+    "Kallman":     { name:"Sen. Meghan Kallman",      email:"sen-kallman@rilin.state.ri.us",      district:"Pawtucket" },
+    "Lauria":      { name:"Sen. Pamela Lauria",       email:"sen-lauria@rilin.state.ri.us",       district:"Barrington/Warren" },
+    "LaMountain":  { name:"Sen. Matthew LaMountain",  email:"sen-lamountain@rilin.state.ri.us",   district:"Woonsocket/North Smithfield" },
+    "Lawson":      { name:"Sen. Valarie Lawson",      email:"sen-lawson@rilin.state.ri.us",       district:"East Providence" },
+    "Mack":        { name:"Sen. Tiara Mack",          email:"sen-mack@rilin.state.ri.us",         district:"Providence" },
+    "McKenney":    { name:"Sen. Mark McKenney",       email:"sen-mckenney@rilin.state.ri.us",     district:"Warwick" },
+    "Morgan":      { name:"Sen. Edward Morgan",       email:"sen-morgan@rilin.state.ri.us",       district:"North Kingstown" },
+    "Murray":      { name:"Sen. Sandra Murray",       email:"sen-murray@rilin.state.ri.us",       district:"Providence" },
+    "Paolino":     { name:"Sen. John Paolino",        email:"sen-paolino@rilin.state.ri.us",      district:"Lincoln/North Providence" },
+    "Patalano":    { name:"Sen. Frank Patalano",      email:"sen-patalano@rilin.state.ri.us",     district:"Johnston" },
+    "Pearson":     { name:"Sen. Cynthia Pearson",     email:"sen-pearson@rilin.state.ri.us",      district:"Cumberland" },
+    "Quezada":     { name:"Sen. Ana Quezada",         email:"sen-quezada@rilin.state.ri.us",      district:"Providence" },
+    "Raptakis":    { name:"Sen. Leonard Raptakis",    email:"sen-raptakis@rilin.state.ri.us",     district:"Coventry/West Greenwich" },
+    "Rogers":      { name:"Sen. Elaine Morgan",       email:"sen-emorgan@rilin.state.ri.us",      district:"Hopkinton/Richmond/Westerly" },
+    "Thompson":    { name:"Sen. Melissa Murray",      email:"sen-thompson@rilin.state.ri.us",     district:"Exeter/West Greenwich" },
+    "Tikoian":     { name:"Sen. Michael Tikoian",     email:"sen-tikoian@rilin.state.ri.us",      district:"Smithfield/North Smithfield" },
+    "Ujifusa":     { name:"Sen. Linda Ujifusa",       email:"sen-ujifusa@rilin.state.ri.us",      district:"Portsmouth" },
+    "Urso":        { name:"Sen. Marc Urso",           email:"sen-urso@rilin.state.ri.us",         district:"Johnston/Providence" },
+    "Valverde":    { name:"Sen. Bridget Valverde",    email:"sen-valverde@rilin.state.ri.us",     district:"North Kingstown" },
+    "Vargas":      { name:"Sen. Ana Vargas",          email:"sen-vargas@rilin.state.ri.us",       district:"Central Falls" },
+    "Zurier":      { name:"Sen. Samuel Zurier",       email:"sen-zurier@rilin.state.ri.us",       district:"Providence" },
+  }
+};
+
+// ZIP → district lookup (RI zip codes mapped to representative/senator last names)
+const ZIP_TO_REPS = {
+  "02801": {rep:"Quattrocchi", sen:"Burke"},
+  "02802": {rep:"Place", sen:"Tikoian"},
+  "02804": {rep:"Azzinaro", sen:"Gu"},
+  "02806": {rep:"Speakman", sen:"Felag"},
+  "02807": {rep:"Fogarty", sen:"DiMario"},
+  "02808": {rep:"Fogarty", sen:"DiMario"},
+  "02809": {rep:"Speakman", sen:"Felag"},
+  "02812": {rep:"Fogarty", sen:"DiMario"},
+  "02813": {rep:"Fogarty", sen:"DiMario"},
+  "02814": {rep:"Place", sen:"Tikoian"},
+  "02815": {rep:"Roberts", sen:"Raptakis"},
+  "02816": {rep:"Noret", sen:"Raptakis"},
+  "02817": {rep:"Roberts", sen:"Raptakis"},
+  "02818": {rep:"Caldwell", sen:"Valverde"},
+  "02822": {rep:"Hopkins", sen:"Burke"},
+  "02823": {rep:"Serpa", sen:"Raptakis"},
+  "02824": {rep:"Place", sen:"Tikoian"},
+  "02825": {rep:"Hopkins", sen:"Burke"},
+  "02826": {rep:"Place", sen:"Tikoian"},
+  "02827": {rep:"Hopkins", sen:"Burke"},
+  "02828": {rep:"McGaw", sen:"Tikoian"},
+  "02829": {rep:"Place", sen:"Tikoian"},
+  "02830": {rep:"Place", sen:"LaMountain"},
+  "02831": {rep:"Handy", sen:"Burke"},
+  "02832": {rep:"Fogarty", sen:"DiMario"},
+  "02833": {rep:"Azzinaro", sen:"Gu"},
+  "02835": {rep:"Fogarty", sen:"DiMario"},
+  "02836": {rep:"Fogarty", sen:"DiMario"},
+  "02837": {rep:"Edwards", sen:"DiPalma"},
+  "02838": {rep:"Santucci", sen:"LaMountain"},
+  "02839": {rep:"Place", sen:"Tikoian"},
+  "02840": {rep:"Voas", sen:"Euer"},
+  "02841": {rep:"Voas", sen:"Euer"},
+  "02842": {rep:"Cortvriend", sen:"DiPalma"},
+  "02852": {rep:"Solomon", sen:"Valverde"},
+  "02857": {rep:"Place", sen:"Tikoian"},
+  "02858": {rep:"Place", sen:"Tikoian"},
+  "02859": {rep:"Santucci", sen:"LaMountain"},
+  "02860": {rep:"Cruz", sen:"Kallman"},
+  "02861": {rep:"Kazarian", sen:"Lawson"},
+  "02862": {rep:"Kazarian", sen:"Lawson"},
+  "02863": {rep:"Kazarian", sen:"Lawson"},
+  "02864": {rep:"Chippendale", sen:"Dimitri"},
+  "02865": {rep:"Chippendale", sen:"Dimitri"},
+  "02871": {rep:"Speakman", sen:"Felag"},
+  "02872": {rep:"Cortvriend", sen:"DiPalma"},
+  "02874": {rep:"Casimiro", sen:"Valverde"},
+  "02875": {rep:"Fogarty", sen:"DiMario"},
+  "02876": {rep:"Santucci", sen:"LaMountain"},
+  "02877": {rep:"Roberts", sen:"Raptakis"},
+  "02878": {rep:"Cortvriend", sen:"DiPalma"},
+  "02879": {rep:"McEntee", sen:"DiMario"},
+  "02881": {rep:"McEntee", sen:"DiMario"},
+  "02882": {rep:"McEntee", sen:"DiMario"},
+  "02885": {rep:"Speakman", sen:"Felag"},
+  "02886": {rep:"Serpa", sen:"McKenney"},
+  "02887": {rep:"Serpa", sen:"McKenney"},
+  "02888": {rep:"Caldwell", sen:"McKenney"},
+  "02889": {rep:"Caldwell", sen:"McKenney"},
+  "02891": {rep:"Fogarty", sen:"Gu"},
+  "02892": {rep:"Casimiro", sen:"DiMario"},
+  "02893": {rep:"Serpa", sen:"McKenney"},
+  "02894": {rep:"Fogarty", sen:"DiMario"},
+  "02895": {rep:"Dawson", sen:"LaMountain"},
+  "02896": {rep:"Santucci", sen:"LaMountain"},
+  "02898": {rep:"Boylan", sen:"DiMario"},
+  "02901": {rep:"Lombardi", sen:"Ciccone"},
+  "02902": {rep:"Lombardi", sen:"Ciccone"},
+  "02903": {rep:"Kislak", sen:"Gallo"},
+  "02904": {rep:"Ajello", sen:"Murray"},
+  "02905": {rep:"Morales", sen:"Mack"},
+  "02906": {rep:"Kislak", sen:"Zurier"},
+  "02907": {rep:"Sanchez", sen:"Mack"},
+  "02908": {rep:"Hull", sen:"Ciccone"},
+  "02909": {rep:"Felix", sen:"Mack"},
+  "02910": {rep:"Potter", sen:"McKenney"},
+  "02911": {rep:"McGaw", sen:"Tikoian"},
+  "02912": {rep:"Kislak", sen:"Zurier"},
+  "02914": {rep:"Furtado", sen:"Lawson"},
+  "02915": {rep:"Kazarian", sen:"Lawson"},
+  "02916": {rep:"Dawson", sen:"Lawson"},
+  "02917": {rep:"McGaw", sen:"Tikoian"},
+  "02918": {rep:"Hull", sen:"Ciccone"},
+  "02919": {rep:"Fellela", sen:"Patalano"},
+  "02920": {rep:"Handy", sen:"McKenney"},
+  "02921": {rep:"Handy", sen:"Burke"},
+};
+
+// ── BILL DATA ─────────────────────────────────────────────────────────
+const BILLS = [
+  { num:"H7035", chamber:"House", pbp:"red", title:"One Firearm Per 30 Days Limit", desc:"Prohibits purchasing more than one firearm in a 30-day period.", sponsors:["Boylan","Caldwell","Tanzi","Ajello","Knight","Batista","Dawson","Kazarian","Felix","McEntee"] },
+  { num:"H7128", chamber:"House", pbp:"green", title:"Armed Campus Police Mandate", desc:"Mandates arming campus police at public higher educational institutions.", sponsors:["Brien","McEntee","Dawson","Noret","Roberts","Biah","Read","Corvese","Diaz","Hull"] },
+  { num:"H7133", chamber:"House", pbp:"orange", title:"Domestic Abuse — Firearm Surrender", desc:"Sets firearm surrender procedures for domestic abuse respondents.", sponsors:["Lombardi","Hull","Sanchez","Cruz","Stewart"] },
+  { num:"H7145", chamber:"House", pbp:"green", title:"Dillon's Law — Safe Storage Renaming", desc:"Renames safe-storage statute section to include 'Dillon's Law.'", sponsors:["Fellela","Messier","Caldwell","Craven","Kazarian"] },
+  { num:"H7546", chamber:"House", pbp:"orange", title:"Peace Officer Definition Expansion (DCYF)", desc:"Expands peace officer definition to include DCYF juvenile workers.", sponsors:["Dawson"] },
+  { num:"H7553", chamber:"House", pbp:"green", title:"Carry Permit Review & Appeal Process", desc:"Establishes review and appeal process for carry permit denials.", sponsors:["Noret","Place","Corvese","Chippendale","Dawson","Phillips","Bennett","Brien","Casey","Read"] },
+  { num:"H7557", chamber:"House", pbp:"red", title:"RI Firearm Industry Accountability Act (House)", desc:"Creates civil liability framework for firearm manufacturers and dealers.", sponsors:["Donovan","Boylan","Speakman","Carson","Tanzi","Potter","Fogarty","Ajello","McGaw","Casimiro"] },
+  { num:"H7593", chamber:"House", pbp:"green", title:"Sales Tax Exemption — Firearm Safety Equipment", desc:"Exempts gun safes, locks, and storage devices from sales tax.", sponsors:["Chippendale","Nardone","Fellela","Quattrocchi","Brien","Fascia","Solomon"] },
+  { num:"H7636", chamber:"House", pbp:"orange", title:"Voluntary Firearm Restrictions Act", desc:"Creates voluntary do-not-sell/possess list for firearms.", sponsors:["Boylan","Caldwell","Casimiro","Dawson","Craven","Read","Batista","Felix","Ajello","Knight"] },
+  { num:"H7650", chamber:"House", pbp:"orange", title:"Stun Gun Carry Permit & Transfer Penalties", desc:"Allows licensed adults to carry stun guns; criminalizes transfer to minors.", sponsors:["Lima","Fellela","Place","Corvese","Azzinaro","Kennedy","Bennett","Edwards","Phillips","Casey"] },
+  { num:"H7753", chamber:"House", pbp:"green", title:"Felony — Disarming a Peace Officer", desc:"Makes disarming a peace officer a felony.", sponsors:["Read","Chippendale","Santucci","Noret","Serpa","Spears","Brien","Fascia","Corvese","Fellela"] },
+  { num:"H7754", chamber:"House", pbp:"red", title:"Eliminate Non-Resident Concealed Carry Reciprocity", desc:"Removes provision allowing out-of-state concealed carry permits in RI.", sponsors:["Fogarty","Handy","Donovan","McEntee","Caldwell","Tanzi","Smith","Kazarian","Cortvriend","Carson"] },
+  { num:"H7755", chamber:"House", pbp:"red", title:"Responsible Firearm Purchasing Act (House)", desc:"Requires safety training for all firearm purchases.", sponsors:["Boylan","Tanzi","Dawson","Craven","Caldwell","Read","Batista","Stewart","Felix","Knight"] },
+  { num:"H8067", chamber:"House", pbp:"red", title:"Felony Conviction Firearm Disqualification", desc:"Bars people with prior felony convictions from buying or possessing firearms.", sponsors:["Furtado","Boylan","Tanzi","Donovan","Alzate","Casimiro","Caldwell","Messier","Stewart","Potter"] },
+  { num:"H8068", chamber:"House", pbp:"orange", title:"Minor Firearm Possession Prohibition", desc:"Makes it unlawful for persons under 18 to possess a firearm.", sponsors:["Boylan","Tanzi","Furtado","Ajello","Caldwell","Knight","Dawson","Diaz"] },
+  { num:"H8069", chamber:"House", pbp:"orange", title:"Shooting Range Suicide Prevention Signage", desc:"Requires ranges to post 988 crisis hotline signs.", sponsors:["Donovan","Boylan","Speakman","Carson","Tanzi","Potter","Fogarty","Ajello","McGaw","Casimiro"] },
+  { num:"H8070", chamber:"House", pbp:"green", title:"Campus Stun Gun & Pepper Spray Self-Defense", desc:"Allows college students/staff to carry stun guns or pepper spray for self-defense.", sponsors:["Hopkins","Casimiro","Casey","Noret","Brien","Place"] },
+  { num:"H8071", chamber:"House", pbp:"red", title:"Ammunition Background Check Requirement", desc:"Requires background check for all ammunition purchases.", sponsors:["Caldwell","Potter","Boylan","Knight","Carson","McEntee","McGaw","Voas","Casimiro","Furtado"] },
+  { num:"H8072", chamber:"House", pbp:"green", title:"Stun Gun Legalization for Adults (House)", desc:"Legalizes adult purchase of stun guns; criminalizes use in crimes.", sponsors:["Casey","Chippendale","Hopkins","Brien","Costantino","Corvese","OBrien","Dawson","Read","Biah"] },
+  { num:"H8073", chamber:"House", pbp:"red", title:"Prohibited Firearms — Possession Ban", desc:"Expands assault weapons ban to cover possession, not just sale.", sponsors:["Tanzi","Boylan","Alzate","Stewart","Kislak","Handy","Ajello","Giraldo","Edwards","Morales"] },
+  { num:"H8075", chamber:"House", pbp:"red", title:"Mandatory Firearm Liability Insurance ($1M)", desc:"Requires all firearm owners to carry $1M liability insurance.", sponsors:["Caldwell","Potter","Boylan","Knight","Carson","McEntee","McGaw","Casimiro","Furtado","Ajello"] },
+  { num:"S2053", chamber:"Senate", pbp:"green", title:"Armed Campus Police Mandate (Senate)", desc:"Senate version: mandates arming campus police at public colleges.", sponsors:["Appollonio","Tikoian","Ciccone","de la Cruz","Paolino","Famiglietti","Patalano","LaMountain","Thompson","Dimitri"] },
+  { num:"S2056", chamber:"Senate", pbp:"red", title:"Felony Conviction Firearm Disqualification (Senate)", desc:"Senate version: disqualifies felony convicts from firearm purchase/possession.", sponsors:["Euer","Valverde","Quezada","Kallman","Lauria","Vargas","Acosta","Mack","Pearson","Zurier"] },
+  { num:"S2086", chamber:"Senate", pbp:"green", title:"Sales Tax Exemption — Firearms & Ammunition", desc:"Exempts firearms, ammunition, and safety devices from sales tax.", sponsors:["Paolino","Morgan","Rogers","de la Cruz","Ciccone","Tikoian","Kallman","Lauria","Murray","Urso"] },
+  { num:"S2144", chamber:"Senate", pbp:"orange", title:"Domestic Violence — Batterers Intervention Program", desc:"Lets court set batterers intervention program hours and costs.", sponsors:["LaMountain"] },
+  { num:"S2153", chamber:"Senate", pbp:"green", title:"Concealed Carry Reciprocity (Senate)", desc:"Allows AG to enter reciprocity agreements for out-of-state carry permits.", sponsors:["Rogers","de la Cruz","Morgan","Paolino"] },
+  { num:"S2155", chamber:"Senate", pbp:"green", title:"Permitless Concealed Carry (21+)", desc:"Allows RI residents 21+ to carry concealed without a permit, with conditions.", sponsors:["Rogers","de la Cruz","Morgan","Paolino"] },
+  { num:"S2163", chamber:"Senate", pbp:"green", title:"Carry Permit Appeal — Trial De Novo", desc:"Creates structured appeal process for carry permit denials.", sponsors:["de la Cruz","Ciccone","Burke","Dimitri","Appollonio","LaMountain","Rogers"] },
+  { num:"S2164", chamber:"Senate", pbp:"green", title:"Concealed Carry Permit Framework Overhaul", desc:"Overhauls RI concealed carry permitting definitions and processes.", sponsors:["Rogers","de la Cruz","Morgan","Paolino"] },
+  { num:"S2277", chamber:"Senate", pbp:"green", title:"Concealed Carry Permit Reform (Alternate)", desc:"Alternative overhaul of concealed carry permit framework.", sponsors:["Rogers","Paolino","de la Cruz","Appollonio","Famiglietti","Tikoian","Ciccone","Raptakis","Patalano","Dimitri"] },
+  { num:"S2283", chamber:"Senate", pbp:"green", title:"Civil Liability for Gun-Free Zone Harm", desc:"Lets licensed carriers sue property owners who post gun-free zones if harmed.", sponsors:["de la Cruz","Ciccone","Burke","Dimitri","Appollonio","LaMountain","Rogers"] },
+  { num:"S2285", chamber:"Senate", pbp:"green", title:"Enhanced Penalties — Stolen Firearm in Violent Crime", desc:"Increases sentences for using or possessing stolen firearms in violent crimes.", sponsors:["Raptakis","Famiglietti","Appollonio","Burke","Rogers","Patalano","Thompson","Dimitri","Tikoian","Felag"] },
+  { num:"S2292", chamber:"Senate", pbp:"green", title:"Felony — Disarming a Peace Officer (Senate)", desc:"Senate version: makes disarming a peace officer a felony.", sponsors:["DiPalma","LaMountain","Burke","Tikoian","McKenney","Paolino","Raptakis","Euer"] },
+  { num:"S2295", chamber:"Senate", pbp:"red", title:"One Firearm Per 30 Days Limit (Senate)", desc:"Senate version: prohibits buying more than one firearm per 30 days.", sponsors:["McKenney","LaMountain","Bissaillon","Lawson","DiPalma"] },
+  { num:"S2306", chamber:"Senate", pbp:"green", title:"Suppressor/Silencer Legalization for Hunting", desc:"Allows suppressors on long guns for hunting; preempts local regulations.", sponsors:["Rogers","Morgan","de la Cruz","Paolino","Dimitri","Raptakis"] },
+  { num:"S2314", chamber:"Senate", pbp:"green", title:"Large Capacity Feeding Device — Penalty Reform", desc:"Makes first LCM possession offense a misdemeanor, subsequent a felony.", sponsors:["Raptakis","Famiglietti","Appollonio","Tikoian","Burke","Felag","Thompson","Patalano","Ciccone","Dimitri"] },
+  { num:"S2395", chamber:"Senate", pbp:"green", title:"Stun Gun Legalization for Adults (Senate)", desc:"Senate version: legalizes adult stun gun purchase; criminalizes misuse.", sponsors:["Thompson","Dimitri","Burke","Ciccone","Famiglietti","Tikoian","Appollonio","Patalano","Raptakis","Paolino"] },
+  { num:"S2611", chamber:"Senate", pbp:"red", title:"RI Firearm Industry Accountability Act (Senate)", desc:"Senate version: civil liability for firearm manufacturers and dealers.", sponsors:["Lauria","DiMario","LaMountain","McKenney","Mack","Ujifusa","Valverde","Euer","Acosta","Bissaillon"] },
+  { num:"S2710", chamber:"Senate", pbp:"red", title:"Prohibited Firearms — Possession Ban (Senate)", desc:"Senate companion to H8073: bans possession of prohibited firearms.", sponsors:["Mack","Lauria","Valverde","Kallman","McKenney","DiMario","Gu","Euer","Zurier","Ujifusa"] },
+  { num:"S2726", chamber:"Senate", pbp:"red", title:"Responsible Firearm Purchasing Act (Senate)", desc:"Senate version: safety training required for all firearm purchases.", sponsors:["McKenney","Bissaillon","Britto","Gu","Zurier","DiPalma","Murray","Euer"] },
+  { num:"S2958", chamber:"Senate", pbp:"orange", title:"Shooting Range Suicide Awareness — Signage & Training", desc:"Requires ranges to post suicide awareness signs and train employees.", sponsors:["DiPalma","Lauria","DiMario","LaMountain"] },
+  { num:"S2971", chamber:"Senate", pbp:"orange", title:"Voluntary Do-Not-Sell Firearm Registry (Senate)", desc:"Creates voluntary self-exclusion registry for firearm purchases.", sponsors:["Valverde","Lauria","Kallman","Acosta","Ujifusa","Euer","DiMario","Urso","Murray"] },
+  { num:"S3038", chamber:"Senate", pbp:"red", title:"Extreme Risk Protection Orders — Involuntary ER Transport", desc:"Requires involuntary ER transport before ERPO respondent can speak.", sponsors:["Patalano","Dimitri","Appollonio","Urso","Burke","de la Cruz","Raptakis"] },
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────
+let selectedBills = {}; // { billNum: 'support' | 'oppose' }
+let userLegislators = []; // [{name, email}]
+let generatedLetters = {}; // { billNum: { recipients:[...], text:'' } }
+
+// ── INIT ──────────────────────────────────────────────────────────────
+function makeBillRow(bill) {
+  const pbpColors = {green:'pbp-green', red:'pbp-red', orange:'pbp-orange'};
+  const pbpLabels = {green:'✓ Favorable', red:'✗ Unfavorable', orange:'~ Neutral'};
+  const div = document.createElement('div');
+  div.className = 'bill-check';
+  div.id = `bill-row-${bill.num}`;
+  div.innerHTML = `
+    <input type="checkbox" id="chk-${bill.num}" onchange="toggleBill('${bill.num}', this.checked)" />
+    <div class="bill-info">
+      <div>
+        <span class="bill-num" style="color:${bill.pbp==='red'?'#e74c3c':bill.pbp==='green'?'#2eab7a':'#e8a838'}">${bill.num}</span>
+        <span style="font-size:10px;color:#566778;margin-left:6px">${bill.chamber}</span>
+        <span class="pbp ${pbpColors[bill.pbp]}">${pbpLabels[bill.pbp]}</span>
+      </div>
+      <div class="bill-title-sm">${bill.title}</div>
+      <div class="bill-desc-sm">${bill.desc}</div>
+      <div class="stance-toggle hidden" id="stance-${bill.num}">
+        <button class="stance-btn stance-support" id="support-${bill.num}" onclick="setStance('${bill.num}','support')">✓ Support</button>
+        <button class="stance-btn stance-oppose" id="oppose-${bill.num}" onclick="setStance('${bill.num}','oppose')">✗ Oppose</button>
+      </div>
+    </div>`;
+  return div;
+}
+
+function init() {
+  const containers = {
+    red:    document.getElementById('billList-red'),
+    green:  document.getElementById('billList-green'),
+    orange: document.getElementById('billList-orange'),
+  };
+  BILLS.forEach(bill => {
+    const target = containers[bill.pbp] || containers.orange;
+    target.appendChild(makeBillRow(bill));
+  });
+}
+
+// ── CHECK GROUP ───────────────────────────────────────────────────────
+function checkGroup(group) {
+  BILLS.forEach(bill => {
+    const chk = document.getElementById(`chk-${bill.num}`);
+    if (!chk) return;
+    const matches = group === 'all' || group === bill.pbp;
+    const shouldCheck = group !== 'none' && matches;
+    if (shouldCheck && !chk.checked) {
+      chk.checked = true;
+      toggleBill(bill.num, true);
+    } else if (!shouldCheck && chk.checked) {
+      chk.checked = false;
+      toggleBill(bill.num, false);
+    }
+  });
+}
+
+function toggleBill(num, checked) {
+  const stanceDiv = document.getElementById(`stance-${num}`);
+  const row = document.getElementById(`bill-row-${num}`);
+  if (checked) {
+    stanceDiv.classList.remove('hidden');
+    // Default stance based on PBP color
+    const bill = BILLS.find(b => b.num === num);
+    const defaultStance = bill.pbp === 'red' ? 'oppose' : 'support';
+    setStance(num, defaultStance);
+  } else {
+    stanceDiv.classList.add('hidden');
+    delete selectedBills[num];
+    row.className = 'bill-check';
+  }
+}
+
+function setStance(num, stance) {
+  selectedBills[num] = stance;
+  const row = document.getElementById(`bill-row-${num}`);
+  row.className = `bill-check selected-${stance}`;
+  document.getElementById(`support-${num}`).className = `stance-btn stance-support${stance==='support'?' active':''}`;
+  document.getElementById(`oppose-${num}`).className  = `stance-btn stance-oppose${stance==='oppose'?' active':''}`;
+}
+
+// ── LEGISLATOR LOOKUP ─────────────────────────────────────────────────
+function lookupLegislators() {
+  const zip = document.getElementById('zipCode').value.trim();
+  if (zip.length !== 5) { alert('Please enter a 5-digit ZIP code'); return; }
+  const found = ZIP_TO_REPS[zip];
+  const resultDiv = document.getElementById('legislatorResult');
+  const tagsDiv   = document.getElementById('legislatorTags');
+  if (!found) {
+    tagsDiv.innerHTML = `<span style="color:#e74c3c;font-size:12px">ZIP code not found. Please verify your ZIP or check rilegislature.gov to find your legislators manually.</span>`;
+    resultDiv.classList.remove('hidden');
+    return;
+  }
+  userLegislators = [];
+  const addLeg = (type, key) => {
+    const db = type === 'rep' ? LEGISLATORS.house : LEGISLATORS.senate;
+    const leg = db[key];
+    if (leg) userLegislators.push(leg);
+  };
+  addLeg('rep', found.rep);
+  addLeg('sen', found.sen);
+  tagsDiv.innerHTML = userLegislators.map(l =>
+    `<span class="recipient-tag">${l.name} — ${l.district}</span>`
+  ).join('');
+  resultDiv.classList.remove('hidden');
+}
+
+// ── GET SPONSORS ──────────────────────────────────────────────────────
+function getSponsorsForBill(bill) {
+  const db = bill.chamber === 'House' ? LEGISLATORS.house : LEGISLATORS.senate;
+  return bill.sponsors
+    .map(s => db[s])
+    .filter(Boolean);
+}
+
+// ── GENERATE LETTERS ──────────────────────────────────────────────────
+async function generateLetters(mode) {
+  const firstName = document.getElementById('firstName').value.trim();
+  const lastName  = document.getElementById('lastName').value.trim();
+  const userEmail = document.getElementById('userEmail').value.trim();
+  const town      = document.getElementById('town').value.trim();
+
+  if (!firstName || !lastName || !userEmail || !town) {
+    showStatus('error', 'Please fill in your name, email, and town first.');
+    return;
+  }
+  if (Object.keys(selectedBills).length === 0) {
+    showStatus('error', 'Please select at least one bill in Step 2 first.');
+    return;
+  }
+
+  const btnReview = document.getElementById('generateBtnReview');
+  const btnSend   = document.getElementById('generateBtnSend');
+  btnReview.disabled = true;
+  btnSend.disabled   = true;
+  btnReview.innerHTML = '<span class="spinner"></span>Composing...';
+  btnSend.innerHTML   = '<span class="spinner"></span>Composing...';
+  document.getElementById('lettersContainer').innerHTML = '';
+  const count = Object.keys(selectedBills).length;
+  showStatus('info', `Composing ${count} letter${count!==1?'s':''}...`);
+
+  for (const [billNum, stance] of Object.entries(selectedBills)) {
+    const bill = BILLS.find(b => b.num === billNum);
+    if (!bill) continue;
+
+    const sponsors = getSponsorsForBill(bill);
+    const allRecipients = [...sponsors];
+    userLegislators.forEach(leg => {
+      if (!allRecipients.find(r => r.email === leg.email)) {
+        allRecipients.push(leg);
+      }
+    });
+
+    try {
+      const letterText = await generateOneLetter(firstName, lastName, town, bill, stance, allRecipients);
+      generatedLetters[billNum] = { recipients: allRecipients, text: letterText };
+      if (mode === 'review') {
+        renderLetterCard(bill, stance, allRecipients, letterText);
+      } else {
+        // Send immediately without showing review card
+        await sendLetterDirect(billNum, allRecipients, letterText, firstName, lastName, userEmail, bill);
+        renderSentConfirmation(bill, stance, allRecipients);
+      }
+    } catch (e) {
+      renderLetterError(bill, e.message);
+    }
+  }
+
+  btnReview.disabled = false;
+  btnSend.disabled   = false;
+  btnReview.innerHTML = '✎ Review & Edit';
+  btnSend.innerHTML   = '&#9658; Send Without Review';
+  if (mode === 'review') {
+    showStatus('success', `${count} letter${count!==1?'s':''} ready. Review and edit below, then click Send.`);
+  } else {
+    showStatus('success', `${count} letter${count!==1?'s':''} sent successfully to your legislators.`);
+  }
+}
+
+async function generateOneLetter(firstName, lastName, town, bill, stance, recipients) {
+  const recipientName = recipients.length > 0 ? recipients[0].name : 'Representative';
+  const stanceWord = stance === 'support' ? 'support' : 'oppose';
+  const targetWords = 300 + Math.floor(Math.random() * 201); // 300–500
+
+  // Vary the letter style slightly each time for naturalness
+  const styles = [
+    'Write as a concerned citizen speaking from personal experience and community values.',
+    'Write as an engaged voter who has researched this issue carefully.',
+    'Write as a community member who cares deeply about Rhode Island families.',
+    'Write as a longtime Rhode Island resident with a personal stake in this legislation.',
+    'Write as a constituent who follows state legislation closely and wants their voice heard.',
+  ];
+  const styleHint = styles[Math.floor(Math.random() * styles.length)];
+
+  const prompt = `You are writing a constituent letter on behalf of ${firstName} ${lastName} of ${town}, Rhode Island.
+
+Bill: RI 2026 ${bill.num} — "${bill.title}"
+What it does: ${bill.desc}
+Constituent's position: They ${stanceWord} this bill.
+Primary recipient: ${recipientName}
+All recipients: ${recipients.map(r => r.name).join(', ')}
+
+${styleHint}
+
+Write a complete, professional constituent letter with these qualities:
+- Opens with "Dear ${recipientName},"
+- Introduces ${firstName} as a resident of ${town} in the opening sentence
+- States their position on ${bill.num} clearly and early
+- Gives 3-4 substantive, specific reasons for their position — grounded in real-world impact on Rhode Island residents, not abstract principles
+- Uses natural, human language — vary sentence length, include one personal or community-based observation
+- Maintains a respectful, professional tone throughout — firm but never combative
+- Closes with a specific ask (vote yes/no) and thanks the legislator for their public service
+- Signs off as: Respectfully,\n${firstName} ${lastName}\n${town}, Rhode Island
+- Target length: approximately ${targetWords} words
+- Do NOT use placeholder text, brackets, or generic filler phrases like "as a concerned citizen" — write it fully and specifically`;
+
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1200,
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+
+  if (!response.ok) throw new Error(`API error: ${response.status}`);
+  const data = await response.json();
+  return data.content.find(b => b.type === 'text')?.text || '';
+}
+
+// ── RENDER LETTER CARD ────────────────────────────────────────────────
+function renderLetterCard(bill, stance, recipients, text) {
+  const container = document.getElementById('lettersContainer');
+  const card = document.createElement('div');
+  card.className = 'letter-block';
+  const stanceColor = stance === 'support' ? '#2eab7a' : '#c0392b';
+  const stanceLabel = stance === 'support' ? '✓ Supporting' : '✗ Opposing';
+  card.innerHTML = `
+    <div class="letter-header">
+      <div>
+        <span style="font-family:monospace;font-weight:800;color:${stanceColor}">${bill.num}</span>
+        <span style="font-size:11px;color:#566778;margin-left:8px">${bill.title}</span>
+        <span style="font-size:10px;padding:2px 8px;border-radius:4px;background:${stanceColor}22;color:${stanceColor};margin-left:8px">${stanceLabel}</span>
+      </div>
+    </div>
+    <div class="letter-body">
+      <h3 style="margin-bottom:8px">Recipients (${recipients.length})</h3>
+      <div class="recipient-tags" style="margin-bottom:14px">
+        ${recipients.map(r => `<span class="recipient-tag">${r.name}</span>`).join('')}
+      </div>
+      <h3 style="margin-bottom:8px">Letter</h3>
+      <textarea id="letter-text-${bill.num}">${text}</textarea>
+    </div>
+    <div class="letter-actions">
+      <button class="btn btn-green" onclick="sendLetter('${bill.num}')">
+        &#9658; Send to ${recipients.length} Legislator${recipients.length!==1?'s':''}
+      </button>
+      <button class="btn btn-secondary" onclick="regenerateLetter('${bill.num}')">↺ Rewrite Letter</button>
+      <span id="send-status-${bill.num}" style="font-size:11px;color:#566778;align-self:center;margin-left:8px"></span>
+    </div>`;
+  container.appendChild(card);
+}
+
+function renderLetterError(bill, msg) {
+  const container = document.getElementById('lettersContainer');
+  const div = document.createElement('div');
+  div.className = 'letter-block';
+  div.style.borderColor = '#c0392b44';
+  div.innerHTML = `<div class="letter-header"><span style="color:#e74c3c">${bill.num} — Error generating letter: ${msg}</span></div>`;
+  container.appendChild(div);
+}
+
+async function regenerateLetter(billNum) {
+  const firstName = document.getElementById('firstName').value.trim();
+  const lastName  = document.getElementById('lastName').value.trim();
+  const town      = document.getElementById('town').value.trim();
+  const bill      = BILLS.find(b => b.num === billNum);
+  const stance    = selectedBills[billNum];
+  const { recipients } = generatedLetters[billNum];
+  const textarea = document.getElementById(`letter-text-${billNum}`);
+  textarea.value = 'Rewriting letter...';
+  try {
+    const text = await generateOneLetter(firstName, lastName, town, bill, stance, recipients);
+    textarea.value = text;
+    generatedLetters[billNum].text = text;
+  } catch(e) {
+    textarea.value = `Error: ${e.message}`;
+  }
+}
+
+// ── SEND WITHOUT REVIEW ──────────────────────────────────────────────
+async function sendLetterDirect(billNum, recipients, text, firstName, lastName, userEmail, bill) {
+  const toEmails = recipients.map(r => ({ email: r.email, name: r.name }));
+  const payload = {
+    personalizations: [{ to: toEmails }],
+    from: { email: FROM_EMAIL, name: `${firstName} ${lastName}` },
+    reply_to: { email: userEmail, name: `${firstName} ${lastName}` },
+    subject: `Constituent Letter Re: RI 2026 Bill ${bill.num} — ${bill.title}`,
+    content: [{ type: "text/plain", value: text }]
+  };
+  const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${SENDGRID_KEY}` },
+    body: JSON.stringify(payload)
+  });
+  if (res.status !== 202) {
+    const err = await res.text();
+    throw new Error(`SendGrid error ${res.status}: ${err.substring(0,100)}`);
+  }
+}
+
+function renderSentConfirmation(bill, stance, recipients) {
+  const container = document.getElementById('lettersContainer');
+  const stanceColor = stance === 'support' ? '#2eab7a' : '#c0392b';
+  const stanceLabel = stance === 'support' ? '✓ Supporting' : '✗ Opposing';
+  const div = document.createElement('div');
+  div.className = 'letter-block';
+  div.style.borderColor = '#2eab7a44';
+  div.innerHTML = `
+    <div class="letter-header" style="background:#1a4a2a22;">
+      <div>
+        <span style="font-family:monospace;font-weight:800;color:${stanceColor}">${bill.num}</span>
+        <span style="font-size:11px;color:#566778;margin-left:8px">${bill.title}</span>
+        <span style="font-size:10px;padding:2px 8px;border-radius:4px;background:${stanceColor}22;color:${stanceColor};margin-left:8px">${stanceLabel}</span>
+      </div>
+      <span style="font-size:12px;color:#2eab7a;font-weight:600;">✓ Sent to ${recipients.length} legislator${recipients.length!==1?'s':''}</span>
+    </div>
+    <div style="padding:10px 16px;">
+      <div class="recipient-tags">
+        ${recipients.map(r => `<span class="recipient-tag">${r.name}</span>`).join('')}
+      </div>
+    </div>`;
+  container.appendChild(div);
+}
+
+// ── SEND VIA SENDGRID ─────────────────────────────────────────────────
+async function sendLetter(billNum) {
+  const { recipients } = generatedLetters[billNum];
+  const text      = document.getElementById(`letter-text-${billNum}`).value;
+  const firstName = document.getElementById('firstName').value.trim();
+  const lastName  = document.getElementById('lastName').value.trim();
+  const userEmail = document.getElementById('userEmail').value.trim();
+  const bill      = BILLS.find(b => b.num === billNum);
+  const statusEl  = document.getElementById(`send-status-${billNum}`);
+
+  statusEl.innerHTML = '<span class="spinner" style="border-top-color:#2eab7a"></span>Sending...';
+
+  const toEmails = recipients.map(r => ({ email: r.email, name: r.name }));
+
+  const payload = {
+    personalizations: [{ to: toEmails }],
+    from: { email: FROM_EMAIL, name: `${firstName} ${lastName}` },
+    reply_to: { email: userEmail, name: `${firstName} ${lastName}` },
+    subject: `Constituent Letter Re: RI 2026 Bill ${bill.num} — ${bill.title}`,
+    content: [{ type: "text/plain", value: text }]
+  };
+
+  try {
+    const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${SENDGRID_KEY}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.status === 202) {
+      statusEl.innerHTML = `<span style="color:#2eab7a">✓ Sent to ${recipients.length} legislator${recipients.length!==1?'s':''}!</span>`;
+    } else {
+      const err = await res.text();
+      statusEl.innerHTML = `<span style="color:#e74c3c">Error ${res.status}: ${err.substring(0,100)}</span>`;
+    }
+  } catch(e) {
+    statusEl.innerHTML = `<span style="color:#e74c3c">Network error: ${e.message}</span>`;
+  }
+}
+
+// ── STATUS BAR ────────────────────────────────────────────────────────
+function showStatus(type, msg) {
+  const el = document.getElementById('statusBar');
+  el.className = `status-bar status-${type}`;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+init();
+</script>
+</body>
+</html>
