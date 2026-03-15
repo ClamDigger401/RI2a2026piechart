@@ -791,7 +791,7 @@ async function generateOneLetter(firstName, lastName, town, bill, stance, recipi
     salutationLine = 'Dear Representative,';
   }
   const stanceWord = stance === 'support' ? 'support' : 'oppose';
-  const targetWords = 300 + Math.floor(Math.random() * 201); // 300–500
+  const targetWords = 150 + Math.floor(Math.random() * 251); // 150–400
 
   // Vary the letter style slightly each time for naturalness
   const styles = [
