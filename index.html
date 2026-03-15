@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark" />
   <meta http-equiv="x-dns-prefetch-control" content="on" />
+  <meta name="theme-color" content="#0d1520" />
+  <meta name="robots" content="index, follow" />
   <title>Rhode Island 2026 — Legislation Facts</title>
   <meta name="description" content="Interactive breakdown of all confirmed bills introduced in the Rhode Island 2026 legislative session — bill numbers, sponsors, and links to official text." />
   <meta name="author" content="parabellumprovisions.com" />
@@ -81,11 +83,15 @@
   </style>
 </head>
 <body>
+<a href="#main-content" style="position:absolute;top:-100px;left:8px;background:#2eab7a;color:#fff;padding:8px 16px;border-radius:0 0 6px 6px;font-size:13px;font-weight:600;text-decoration:none;z-index:9999;" onfocus="this.style.top='0'" onblur="this.style.top='-100px'">Skip to main content</a>
+<main id="main-content">
 <div class="wrap">
 
-  <div class="eyebrow">Rhode Island · 2026 Session</div>
-  <h1>2026 Legislation Facts</h1>
-  <p class="subtitle">38 confirmed bills · January–March 2026</p>
+  <header>
+    <div class="eyebrow" aria-hidden="true">Rhode Island · 2026 Session</div>
+    <h1>2026 Legislation Facts</h1>
+    <p class="subtitle">38 confirmed bills · January–March 2026</p>
+  </header>
 
   <!-- Live letter counter badge -->
   <div id="letter-counter-badge" aria-live="polite" style="
@@ -95,10 +101,10 @@
     border-radius:10px; padding:12px 24px; margin:0 auto 8px;
     max-width:420px;">
   </div>
-  <p class="source-credit">Source: <a href="https://parabellumprovisions.com" target="_blank" rel="noopener">Para Bellum Provisions</a> · Bill text links go to official RI Legislature · Color badges reflect Para Bellum's assessment</p>
+  <p class="source-credit">Source: <a href="https://parabellumprovisions.com" target="_blank" rel="noopener noreferrer">Para Bellum Provisions</a> · Bill text links go to official RI Legislature · Color badges reflect Para Bellum's assessment</p>
   <!-- Write to Legislators button -->
   <div style="text-align:center; margin-bottom:28px;">
-    <a href="letters.html" style="
+    <a href="letters.html" aria-label="Write letters to your Rhode Island legislators about these bills" style="
       display:inline-block;
       background:#2eab7a;
       color:#fff;
@@ -113,16 +119,16 @@
       text-align:center;
       letter-spacing:0.5px;
       box-shadow:0 0 18px rgba(46,171,122,0.35);">
-      &#9993; Write to Your Legislators &rarr;
+      ✉ Write to Your Legislators →
     </a>
   </div>
 
   <div class="pie-row">
-    <svg id="pie-svg" width="220" height="220" viewBox="0 0 220 220"></svg>
-    <div class="legend" id="legend"></div>
+    <svg id="pie-svg" width="220" height="220" viewBox="0 0 220 220" role="img" aria-label="Pie chart of 2026 RI legislation bills by category"></svg>
+    <div class="legend" id="legend" role="list" aria-label="Bill categories"></div>
   </div>
   <div id="filter-badge"></div>
-  <div id="bill-list"></div>
+  <div id="bill-list" role="list" aria-label="Bills"></div>
   <div class="note">
     <strong>Sources: </strong>
     Bill data sourced from <a href="https://parabellumprovisions.com" target="_blank" rel="noopener" style="color:#4a9fd4">Para Bellum Provisions 2026 Legislation page</a> and the RI Legislature's official website.
@@ -145,6 +151,7 @@
     </p>
   </footer>
 </div>
+</main>
 <script>
 const BILLS = [
   { num:"H7035", chamber:"House", type:"restriction", pbp:"red", title:"One Firearm Per 30 Days Limit", desc:"Prohibits the purchase of more than one firearm in a thirty (30) day period, with exemptions for law enforcement, inheritance, instruction, temporary rentals at ranges, and licensed collectors.", changes:"Creates a new '1 gun per 30 days' limit covering pistols, rifles, and shotguns. Penalties escalate from misdemeanor (first offense) to felony (subsequent offenses).", status:"Referred to House Judiciary", introduced:"2026", sponsor:"Rep. Boylan + 9 co-sponsors", pdfUrl:"https://webserver.rilegislature.gov/BillText26/HouseText26/H7035.pdf" },
