@@ -114,7 +114,10 @@
     .note { margin-top:24px; padding:14px 18px; background:#121e2b; border-radius:8px; border-left:3px solid #1e3a55; font-size:11px; color:#4a6070; line-height:1.7; }
     .note strong { color:#4a9fd4; }
     .hidden { display:none; }
-    @media(max-width:600px) { .field-row { grid-template-columns:1fr; } }
+    @media(max-width:600px) {
+      .field-row { grid-template-columns:1fr; }
+      #lookupBtn { width:100%; margin-left:0 !important; }
+    }
 
     /* Skip links */
     .skip-links { position:absolute; top:0; left:0; z-index:9999; }
@@ -200,7 +203,7 @@
     </div>
     <div style="margin-bottom:14px;">
       <label for="zipCode">ZIP Code <span style="font-weight:400;color:#566778;">(to find your legislators)</span></label>
-      <div style="display:flex;gap:10px;align-items:center;margin-top:5px;justify-content:space-between;">
+      <div style="display:flex;gap:10px;align-items:center;margin-top:5px;justify-content:space-between;flex-wrap:wrap;">
         <input type="text" id="zipCode" placeholder="ZIP code" maxlength="5" autocomplete="postal-code"
           inputmode="numeric" pattern="[0-9]{5}" aria-describedby="zip-hint"
           style="max-width:160px;flex-shrink:0;" />
