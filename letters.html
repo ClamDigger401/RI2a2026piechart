@@ -204,13 +204,15 @@
     <div style="margin-bottom:14px;">
       <label for="zipCode">ZIP Code <span style="font-weight:400;color:#566778;">(to find your legislators)</span></label>
       <div style="display:flex;gap:10px;align-items:center;margin-top:5px;justify-content:space-between;flex-wrap:wrap;">
-        <input type="text" id="zipCode" placeholder="ZIP code" maxlength="5" autocomplete="postal-code"
-          inputmode="numeric" pattern="[0-9]{5}" aria-describedby="zip-hint"
-          style="max-width:160px;flex-shrink:0;" />
+        <div style="display:flex;flex-direction:column;flex-shrink:0;">
+          <input type="text" id="zipCode" placeholder="ZIP code" maxlength="5" autocomplete="postal-code"
+            inputmode="numeric" pattern="[0-9]{5}" aria-describedby="zip-hint"
+            style="max-width:160px;" />
+          <span id="zip-hint" style="font-size:10px;color:#566778;margin-top:4px;display:block;">Enter your 5-digit Rhode Island ZIP code</span>
+        </div>
         <button class="btn btn-secondary" onclick="lookupLegislators()" id="lookupBtn"
-          aria-describedby="zip-hint" style="white-space:nowrap;margin-left:auto;">Find My Legislators</button>
+          aria-describedby="zip-hint" style="white-space:nowrap;margin-left:auto;align-self:flex-start;">Find My Legislators</button>
       </div>
-      <span id="zip-hint" style="font-size:10px;color:#566778;margin-top:4px;display:block;">Enter your 5-digit Rhode Island ZIP code</span>
     </div>
     <div id="legislatorResult" class="hidden" style="margin-top:14px;" aria-live="polite" aria-atomic="true">
       <h3 id="legislator-heading">Your Legislators</h3>
