@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
 """
 update_bills.py
-Scrapes parabellumprovisions.com/2026-legislation/ for RI bills
+Fetches RI 2026 bill data from Para Bellum Provisions WordPress API
 and regenerates BOTH index.html and letters.html with up-to-date data.
-
 No API key required. Run: python update_bills.py
 """
 
-import re
-import json
-import time
-import urllib.request
+import re, json, time, urllib.request
 from datetime import datetime, timezone
 from html.parser import HTMLParser
 
@@ -22,127 +18,36 @@ RESTRICTION_KW = [
     "background check","waiting period","accountability","liability",
     "do-not-sell","red flag","storage mandate","microstamp","bump stock",
     "assault weapon","ghost gun","disqualif","surrender","insurance",
-    "ammunition background","one firearm per","one gun per",
+    "ammunition background","one firearm per","one gun per","felony conviction",
+    "large capacity","minor.*possess","unlawful.*possess",
 ]
 EXPANSION_KW = [
     "reciprocity","permitless","constitutional carry","repeal",
     "allow","authorize carry","exempt","tax exempt","sales tax",
     "armed campus","silencer","suppressor","civil liability for",
     "carry permit","appeal process","suitable person","concealed carry",
-    "disarming a peace","felony for.*disarm",
+    "disarming a peace","felony for.*disarm","stun gun.*purchase",
+    "electronic dart gun.*purchase",
 ]
 
 def classify(title, desc, changes=""):
     text = (title + " " + desc + " " + changes).lower()
-    r = sum(1 for kw in RESTRICTION_KW if kw in text)
-    e = sum(1 for kw in EXPANSION_KW if kw in text)
+    r = sum(1 for kw in RESTRICTION_KW if re.search(kw, text))
+    e = sum(1 for kw in EXPANSION_KW if re.search(kw, text))
     if e > r: return "expansion"
     if r > 0: return "restriction"
     return "mixed"
 
-def infer_pbp(title, desc, changes=""):
-    """Infer Para Bellum stance from bill content keywords."""
-    text = (title + " " + desc + " " + changes).lower()
-    # Red keywords = bills PBP typically opposes
-    red_kw = ["prohibit","ban","restrict","require training","background check",
-               "waiting period","accountability act","liability","insurance mandate",
-               "disqualif","surrender","ammunition background","one firearm per",
-               "one gun per","involuntary","possession of prohibited","minor.*possess"]
-    # Green keywords = bills PBP typically supports
-    green_kw = ["reciprocity","permitless","constitutional carry","repeal",
-                "sales tax exempt","armed campus","silencer","suppressor",
-                "civil liability for","carry permit.*appeal","disarming a peace",
-                "stolen firearm","felony.*disarm"]
-    r_score = sum(1 for kw in red_kw if re.search(kw, text))
-    g_score = sum(1 for kw in green_kw if re.search(kw, text))
-    if g_score > r_score: return "green"
-    if r_score > g_score: return "red"
-    return "orange"
+def strip_tags(html):
+    """Remove HTML tags and decode common entities."""
+    html = re.sub(r'<[^>]+>', ' ', html)
+    html = html.replace('&amp;', '&').replace('&nbsp;', ' ').replace('&#8212;', '—')
+    html = html.replace('&#8216;', "'").replace('&#8217;', "'").replace('&#8220;', '"').replace('&#8221;', '"')
+    html = re.sub(r'&#\d+;', '', html)
+    html = re.sub(r'&[a-z]+;', '', html)
+    return re.sub(r'\s+', ' ', html).strip()
 
-# ── HTML Parser ───────────────────────────────────────────────────────
-class PBPParser(HTMLParser):
-    LABEL_MAP = {
-        "bill number":"num","bill number:":"num",
-        "sponsors":"sponsor","sponsors:":"sponsor",
-        "bill title":"title","bill title:":"title",
-        "official description":"desc","official description:":"desc",
-        "what changes":"changes","what changes:":"changes",
-        "current status":"status","current status:":"status",
-    }
-
-    def __init__(self):
-        super().__init__()
-        self.bills = []
-        self._cur = {}
-        self._in_strong = False
-        self._label = None
-        self._buf = ""
-        self._last_href = None
-
-    def handle_starttag(self, tag, attrs):
-        d = dict(attrs)
-        if tag == "strong":
-            self._in_strong = True
-            self._buf = ""
-        if tag == "a":
-            self._last_href = d.get("href","")
-            # Detect PBP color from link style/class
-            cls = d.get("class","").lower()
-            style = d.get("style","").lower()
-            if "green" in cls or "green" in style:
-                self._cur["_pbp"] = "green"
-            elif "red" in cls or "red" in style:
-                self._cur["_pbp"] = "red"
-            elif "orange" in cls or "orange" in style:
-                self._cur["_pbp"] = "orange"
-
-    def handle_endtag(self, tag):
-        if tag == "strong":
-            self._in_strong = False
-            label = self._buf.strip().rstrip(":").lower()
-            self._label = self.LABEL_MAP.get(label)
-            self._buf = ""
-        if tag == "a":
-            href = self._last_href or ""
-            if "rilegislature.gov" in href and self._cur:
-                self._cur["pdfUrl"] = href
-            self._last_href = None
-        if tag in ("p","li","div","h3","h4") and self._label and self._buf.strip():
-            val = re.sub(r"^\s*:\s*","",self._buf.strip()).strip()
-            if val:
-                self._cur[self._label] = val
-            self._buf = ""
-            self._label = None
-
-    def handle_data(self, data):
-        text = data.strip()
-        if not text: return
-        if self._in_strong:
-            self._buf += text
-            return
-        if self._label:
-            self._buf += (" " + text) if self._buf else text
-        # Detect bill number in text
-        if re.match(r"^(H|S)\d{4,5}$", text) and self._label == "num":
-            if self._cur.get("num") and self._cur.get("num") != text:
-                self._save()
-            self._cur["num"] = text
-            self._buf = ""
-            self._label = None
-
-    def _save(self):
-        b = self._cur
-        if not b.get("num"): return
-        if not re.match(r"^(H|S)\d{4,5}$", b.get("num","").strip()): return
-        self.bills.append(dict(b))
-        self._cur = {}
-
-    def close(self):
-        super().close()
-        self._save()
-
-def fetch_page(url, retries=3):
-    """Fetch the WordPress REST API endpoint and return the HTML content field."""
+def fetch_api(url, retries=3):
     headers = {
         "User-Agent": "Mozilla/5.0 (compatible; ri-legislation-tracker/2.0)",
         "Accept": "application/json",
@@ -153,193 +58,229 @@ def fetch_page(url, retries=3):
             with urllib.request.urlopen(req, timeout=30) as r:
                 raw = r.read().decode("utf-8", errors="replace")
                 data = json.loads(raw)
-                # Extract rendered HTML content from WordPress API response
                 html = data.get("content", {}).get("rendered", "")
                 if not html:
-                    raise RuntimeError("No content.rendered field in API response")
+                    raise RuntimeError("No content.rendered in API response")
                 print(f"  Downloaded {len(html):,} bytes from WordPress API")
                 return html
         except Exception as e:
             print(f"  Attempt {attempt+1} failed: {e}")
             if attempt < retries - 1:
                 time.sleep(3)
-    raise RuntimeError(f"Failed to fetch WordPress API at {url}")
+    raise RuntimeError(f"Failed to fetch {url}")
 
-def regex_fallback(html):
-    clean = re.sub(r"<[^>]+>"," ",html)
-    clean = re.sub(r"&nbsp;"," ",clean)
-    clean = re.sub(r"\s+"," ",clean)
+def parse_elementor_bills(html):
+    """
+    Parse Elementor-structured bill HTML.
+    Each bill is a text-editor widget followed by a button widget.
+    Button class tells us PBP color: danger=red, success=green, warning=orange.
+    """
     bills = []
-    chunks = re.split(r"(?=Bill [Nn]umber\s*:?\s*[HS]\d{4})", clean)
-    for chunk in chunks:
-        m = re.search(r"Bill [Nn]umber\s*:?\s*([HS]\d{4,5})", chunk)
-        if not m: continue
-        def ef(label, text):
-            r = re.search(rf"{label}\s*:?\s*(.+?)(?=Bill [Nn]umber|Sponsors|Bill Title|Official Description|What Changes|Current Status|$)", text, re.DOTALL|re.IGNORECASE)
-            return r.group(1).strip()[:500] if r else ""
-        bills.append({"num":m.group(1),"sponsor":ef("Sponsors",chunk),
-                      "title":ef("Bill Title",chunk),"desc":ef("Official Description",chunk),
-                      "changes":ef("What Changes",chunk),"status":ef("Current Status",chunk)})
-    return bills
 
-def extract_date(s):
-    m = re.search(r"(\d{2}/\d{2}/\d{4})",s)
-    if m:
-        try: return datetime.strptime(m.group(1),"%m/%d/%Y").strftime("%b %d, %Y")
-        except: pass
-    m2 = re.search(r"(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s*\d{4}",s,re.I)
-    return m2.group(0) if m2 else "2026"
+    # Split into text-editor sections
+    # Each bill block = one elementor-widget-text-editor div
+    text_blocks = re.findall(
+        r'elementor-widget-text-editor.*?<div class="elementor-widget-container">\s*(.*?)\s*</div>\s*</div>\s*</div>',
+        html, re.DOTALL
+    )
 
-def infer_pdf(num):
-    n = num.strip().upper()
-    yr = "26"
-    if n.startswith("S"):
-        return f"https://webserver.rilegislature.gov/BillText{yr}/SenateText{yr}/{n}.pdf"
-    return f"https://webserver.rilegislature.gov/BillText{yr}/HouseText{yr}/{n}.pdf"
+    # Also extract all button blocks with their color and href
+    button_blocks = re.findall(
+        r'elementor-button-(danger|success|warning)[^"]*"[^>]*>.*?href="([^"]+)"',
+        html, re.DOTALL
+    )
 
-def scrape_bills(html):
-    parser = PBPParser()
-    parser.feed(html)
-    parser.close()
-    raw = parser.bills or regex_fallback(html)
-    bills = []
-    for b in raw:
-        num = b.get("num","").strip().upper()
-        if not re.match(r"^(H|S)\d{4,5}$",num): continue
-        title   = b.get("title","").strip()
-        desc    = b.get("desc","").strip()
-        changes = b.get("changes","").strip()
-        sponsor = re.sub(r"\s+"," ",b.get("sponsor","").strip())
-        status  = b.get("status","Referred to Judiciary Committee").strip()
-        pdf_url = b.get("pdfUrl","").strip() or infer_pdf(num)
-        btype   = classify(title, desc, changes)
-        pbp     = b.get("_pbp") or infer_pbp(title, desc, changes)
+    # Build a lookup: bill_number -> (pbp_color, pdf_url)
+    # from the button blocks
+    bill_button_map = {}
+    for color, href in button_blocks:
+        if 'rilegislature.gov' in href:
+            # extract bill number from URL
+            m = re.search(r'/([HS]\d{4,5})\.htm', href, re.I)
+            if m:
+                num = m.group(1).upper()
+                pbp = {'danger': 'red', 'success': 'green', 'warning': 'orange'}.get(color, 'orange')
+                # Use .pdf instead of .htm
+                pdf = href.replace('.htm', '.pdf')
+                bill_button_map[num] = (pbp, pdf)
+
+    print(f"  Found {len(text_blocks)} text blocks, {len(bill_button_map)} bill buttons")
+
+    for block in text_blocks:
+        # Try to find bill number
+        num_m = re.search(r'Bill [Nn]umber\s*:?\s*</strong>\s*([HS]\d{4,5})', block)
+        if not num_m:
+            # Try alternate format
+            num_m = re.search(r'>([HS]\d{4,5})<', block)
+        if not num_m:
+            continue
+
+        num = num_m.group(1).upper().strip()
+        if not re.match(r'^[HS]\d{4,5}$', num):
+            continue
+
+        def extract(label):
+            # Try <strong>Label:</strong> Value pattern
+            pattern = rf'<strong[^>]*>\s*{label}\s*:?\s*</strong>\s*(.*?)(?=<strong|<p[^>]*>|$)'
+            m = re.search(pattern, block, re.DOTALL | re.IGNORECASE)
+            if m:
+                return strip_tags(m.group(1))
+            # Try label at end of strong: <strong>Label: value</strong>
+            pattern2 = rf'<strong[^>]*>\s*{label}\s*:\s*(.*?)</strong>'
+            m2 = re.search(pattern2, block, re.DOTALL | re.IGNORECASE)
+            if m2:
+                return strip_tags(m2.group(1))
+            return ""
+
+        # Extract fields
+        sponsor_raw = extract("Sponsors?")
+        # Clean up sponsor names - remove "Introduced by:" prefix
+        sponsor = re.sub(r'^Introduced by:\s*', '', sponsor_raw).strip()
+        # Extract last names for letters.html
+        sponsor_names = re.findall(r'(?:Rep\.|Sen\.)\s+(?:\w+\s+)?(\w+)', sponsor)
+        if not sponsor_names:
+            # Try just last names after semicolons
+            sponsor_names = [n.strip().rstrip(';').rstrip(',') for n in re.split(r'[;,]', sponsor) if n.strip()]
+            sponsor_names = [n.split()[-1] for n in sponsor_names if n.split()]
+
+        title   = strip_tags(extract("Bill Title"))
+        desc    = strip_tags(extract("Official Description"))
+        changes = strip_tags(extract("What Changes"))
+        status  = strip_tags(extract("Current Status"))
+
+        # Clean up status
+        status = re.sub(r'^:\s*', '', status).strip()
+
+        # Get PBP color and PDF URL from button map
+        pbp_color, pdf_url = bill_button_map.get(num, ('orange', ''))
+        if not pdf_url:
+            # Infer PDF URL
+            yr = "26"
+            if num.startswith('S'):
+                pdf_url = f"https://webserver.rilegislature.gov/BillText{yr}/SenateText{yr}/{num}.pdf"
+            else:
+                pdf_url = f"https://webserver.rilegislature.gov/BillText{yr}/HouseText{yr}/{num}.pdf"
+
+        btype = classify(title, desc, changes)
+        chamber = "Senate" if num.startswith("S") else "House"
+
         bills.append({
             "num": num,
-            "chamber": "Senate" if num.startswith("S") else "House",
+            "chamber": chamber,
             "type": btype,
-            "pbp": pbp,
+            "pbp": pbp_color,
             "title": title or f"RI {num}",
             "desc": desc or title,
             "changes": changes,
-            "status": status,
-            "introduced": extract_date(status),
+            "status": status or "Referred to Judiciary Committee",
+            "introduced": "2026",
             "sponsor": sponsor or "See bill text",
+            "sponsorNames": sponsor_names,
             "pdfUrl": pdf_url,
         })
-    bills.sort(key=lambda x:(0 if x["chamber"]=="House" else 1, x["num"]))
-    # Also build sponsors list for letters.html (last names only)
-    for b in bills:
-        sp = b.get("sponsor","")
-        # Extract last names from sponsor string
-        names = re.findall(r"(?:Rep\.|Sen\.)\s+(?:\w+\s+)?(\w+)", sp)
-        b["sponsorNames"] = names
-    print(f"  Parsed {len(bills)} bills")
-    return bills
 
-# ── Read static template sections from letters.html ───────────────────
-def read_letters_template():
+    # Deduplicate by bill number, keeping first occurrence
+    seen = set()
+    unique = []
+    for b in bills:
+        if b["num"] not in seen:
+            seen.add(b["num"])
+            unique.append(b)
+
+    unique.sort(key=lambda x: (0 if x["chamber"] == "House" else 1, x["num"]))
+    print(f"  Parsed {len(unique)} unique bills")
+    return unique
+
+def read_template(fname):
+    """Read HTML file and split into before/after the BILLS array."""
     try:
-        content = open("letters.html","r").read()
+        content = open(fname, "r").read()
         script_start = content.find("<script>")
         bills_start  = content.find("const BILLS = [", script_start)
-        bills_end    = content.find("];\n\nconst TYPE_META", bills_start) + 2
+        # Find end of BILLS array
+        bills_end = content.find("];\n\nconst TYPE_META", bills_start)
+        if bills_end == -1:
+            bills_end = content.find("];\n\n// ──", bills_start)
+        if bills_end == -1:
+            bills_end = content.find("];\n\nconst LEGISLATORS", bills_start)
+        if bills_end == -1:
+            print(f"  WARNING: Could not find end of BILLS array in {fname}")
+            return None, None, None
+        bills_end += 2  # include the "];"
         return content[:script_start], content[script_start:bills_start], content[bills_end:]
     except Exception as e:
-        print(f"Warning: Could not read letters.html template: {e}")
+        print(f"  ERROR reading {fname}: {e}")
         return None, None, None
 
-# ── Read static template sections from index.html ────────────────────
-def read_index_template():
-    try:
-        content = open("index.html","r").read()
-        script_start = content.find("<script>")
-        bills_start  = content.find("const BILLS = [", script_start)
-        bills_end    = content.find("];\n\nconst TYPE_META", bills_start) + 2
-        return content[:script_start], content[script_start:bills_start], content[bills_end:]
-    except Exception as e:
-        print(f"Warning: Could not read index.html template: {e}")
-        return None, None, None
+def update_file(fname, bills, is_letters=False):
+    before_script, before_bills, after_bills = read_template(fname)
+    if before_script is None:
+        return False
 
-# ── Generate index.html ───────────────────────────────────────────────
-def generate_index(bills, before_script, before_bills, after_bills):
-    updated = datetime.now(timezone.utc).strftime("%B %d, %Y at %H:%M UTC")
-    total = len(bills)
-
-    # Build index-friendly bill objects (no sponsorNames)
-    index_bills = [{k:v for k,v in b.items() if k != "sponsorNames"} for b in bills]
-    bills_json = json.dumps(index_bills, indent=2)
-
-    # Update subtitle with current count
-    updated_before = re.sub(
-        r'\d+ confirmed bills · [^<"]+2026',
-        f'{total} confirmed bills · Updated {datetime.now(timezone.utc).strftime("%B %d, %Y")}',
-        before_script
-    )
-
-    return updated_before + before_bills + bills_json + after_bills
-
-# ── Generate letters.html ─────────────────────────────────────────────
-def generate_letters(bills, before_script, before_bills, after_bills):
-    # Build letters-friendly bill objects with sponsorNames array
-    letters_bills = []
-    for b in bills:
-        lb = {
+    # Build bill objects
+    if is_letters:
+        bill_objs = [{
             "num":      b["num"],
             "chamber":  b["chamber"],
             "pbp":      b["pbp"],
             "title":    b["title"],
             "desc":     b["desc"],
             "sponsors": b.get("sponsorNames", []),
-        }
-        letters_bills.append(lb)
-    bills_json = json.dumps(letters_bills, indent=2)
-    return before_script + before_bills + bills_json + after_bills
+        } for b in bills]
+    else:
+        bill_objs = [{k: v for k, v in b.items() if k != "sponsorNames"} for b in bills]
 
-# ── Main ──────────────────────────────────────────────────────────────
+    bills_json = json.dumps(bill_objs, indent=2)
+
+    # Update subtitle count in index.html
+    total = len(bills)
+    if not is_letters:
+        before_script = re.sub(
+            r'\d+ confirmed bills · [^<"]+',
+            f'{total} confirmed bills · Updated {datetime.now(timezone.utc).strftime("%B %d, %Y")}',
+            before_script
+        )
+
+    result = before_script + before_bills + bills_json + after_bills
+    open(fname, "w").write(result)
+    return True
+
 if __name__ == "__main__":
-    print(f"Fetching WordPress API: {SOURCE_URL} ...")
+    print(f"Fetching WordPress API...")
     try:
-        html = fetch_page(SOURCE_URL)
+        html = fetch_api(SOURCE_URL)
     except RuntimeError as e:
         print(f"ERROR: {e}")
         raise SystemExit(1)
 
-    print("Parsing bills from Para Bellum Provisions...")
-    bills = scrape_bills(html)
+    print("Parsing bills from Elementor content...")
+    bills = parse_elementor_bills(html)
 
     if not bills:
-        print("WARNING: No bills found — page structure may have changed. Aborting.")
+        print("WARNING: No bills found — aborting to prevent data loss.")
         raise SystemExit(1)
 
-    counts = {"restriction":0,"expansion":0,"mixed":0}
+    counts = {"restriction": 0, "expansion": 0, "mixed": 0}
     for b in bills:
         counts[b["type"]] += 1
+
     print(f"\nBill summary:")
-    for t,c in counts.items():
+    for t, c in counts.items():
         print(f"  {t:12s}: {c}")
     print(f"  {'total':12s}: {len(bills)}")
+    print()
 
-    # Update index.html
-    print("\nUpdating index.html...")
-    ib_script, ib_before, ib_after = read_index_template()
-    if ib_script:
-        html_out = generate_index(bills, ib_script, ib_before, ib_after)
-        open("index.html","w").write(html_out)
+    print("Updating index.html...")
+    if update_file("index.html", bills, is_letters=False):
         print("  ✓ index.html updated")
     else:
-        print("  ✗ Could not update index.html — template read failed")
+        print("  ✗ index.html update FAILED")
 
-    # Update letters.html
     print("Updating letters.html...")
-    lb_script, lb_before, lb_after = read_letters_template()
-    if lb_script:
-        html_out = generate_letters(bills, lb_script, lb_before, lb_after)
-        open("letters.html","w").write(html_out)
+    if update_file("letters.html", bills, is_letters=True):
         print("  ✓ letters.html updated")
     else:
-        print("  ✗ Could not update letters.html — template read failed")
+        print("  ✗ letters.html update FAILED")
 
-    print(f"\nDone — {len(bills)} bills written to both files")
-    print(f"Source: {SOURCE_URL}")
-    print(f"Time:   {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}")
+    print(f"\nDone — {len(bills)} bills written")
+    print(f"New bills detected: {', '.join(b['num'] for b in bills)}")
