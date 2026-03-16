@@ -192,22 +192,48 @@ def parse_elementor_bills(html):
     return unique
 
 def read_template(fname):
-    """Read HTML file and split into before/after the BILLS array."""
+    """Read HTML file and split around the BILLS array."""
     try:
         content = open(fname, "r").read()
-        script_start = content.find("<script>")
-        bills_start  = content.find("const BILLS = [", script_start)
-        # Find end of BILLS array
-        bills_end = content.find("];\n\nconst TYPE_META", bills_start)
-        if bills_end == -1:
-            bills_end = content.find("];\n\n// ──", bills_start)
-        if bills_end == -1:
-            bills_end = content.find("];\n\nconst LEGISLATORS", bills_start)
-        if bills_end == -1:
-            print(f"  WARNING: Could not find end of BILLS array in {fname}")
+        if len(content) < 5000:
+            print(f"  ERROR: {fname} is too small ({len(content)} bytes) — file may be corrupted")
             return None, None, None
-        bills_end += 2  # include the "];"
-        return content[:script_start], content[script_start:bills_start], content[bills_end:]
+
+        script_start = content.find("<script>")
+        if script_start == -1:
+            print(f"  ERROR: No <script> tag found in {fname}")
+            return None, None, None
+
+        bills_start = content.find("const BILLS = [", script_start)
+        if bills_start == -1:
+            print(f"  ERROR: No 'const BILLS = [' found in {fname}")
+            return None, None, None
+
+        # Find end of BILLS array — try multiple possible endings
+        bills_end = -1
+        for marker in ["];\n\nconst TYPE_META", "];\n\nconst LEGISLATORS",
+                        "];\n\n// ──", "];\n\nfunction", "];\n\nconst FROM"]:
+            pos = content.find(marker, bills_start)
+            if pos != -1:
+                bills_end = pos + 2  # include "];"
+                print(f"  Found BILLS end at marker: {repr(marker[:20])}")
+                break
+
+        if bills_end == -1:
+            print(f"  ERROR: Could not find end of BILLS array in {fname}")
+            return None, None, None
+
+        before = content[:script_start]
+        middle = content[script_start:bills_start]
+        after  = content[bills_end:]
+
+        print(f"  Template: before={len(before)}, middle={len(middle)}, after={len(after)} bytes")
+
+        if len(before) < 500 or len(after) < 500:
+            print(f"  ERROR: Template split looks wrong — refusing to continue")
+            return None, None, None
+
+        return before, middle, after
     except Exception as e:
         print(f"  ERROR reading {fname}: {e}")
         return None, None, None
@@ -215,6 +241,13 @@ def read_template(fname):
 def update_file(fname, bills, is_letters=False):
     before_script, before_bills, after_bills = read_template(fname)
     if before_script is None:
+        return False
+    if len(bills) < 10:
+        print(f"  SAFETY: Refusing to write {len(bills)} bills to {fname} — minimum is 10")
+        return False
+    # Verify the template looks valid
+    if 'DOCTYPE html' not in before_script and '<!DOCTYPE' not in before_script:
+        print(f"  SAFETY: Template for {fname} looks invalid — aborting")
         return False
 
     # Build bill objects
@@ -256,8 +289,9 @@ if __name__ == "__main__":
     print("Parsing bills from Elementor content...")
     bills = parse_elementor_bills(html)
 
-    if not bills:
-        print("WARNING: No bills found — aborting to prevent data loss.")
+    if len(bills) < 10:
+        print(f"WARNING: Only {len(bills)} bills found — expected 30+. Aborting to prevent data loss.")
+        print("This likely means the parser needs updating. Site files NOT modified.")
         raise SystemExit(1)
 
     counts = {"restriction": 0, "expansion": 0, "mixed": 0}
