@@ -69,84 +69,90 @@ def fetch_api(url, retries=3):
                 time.sleep(3)
     raise RuntimeError(f"Failed to fetch {url}")
 
+def clean_html(html):
+    """Strip all HTML tags including BZ_Pyq_fadeIn spans, decode entities."""
+    # Remove all tags
+    text = re.sub(r'<[^>]+>', ' ', html)
+    text = text.replace('&amp;', '&').replace('&nbsp;', ' ').replace('&#8212;', '—')
+    text = text.replace('&#8216;', "'").replace('&#8217;', "'")
+    text = text.replace('&#8220;', '"').replace('&#8221;', '"')
+    text = re.sub(r'&#\d+;', '', text)
+    text = re.sub(r'&[a-z]+;', '', text)
+    return re.sub(r'\s+', ' ', text).strip()
+
 def parse_elementor_bills(html):
     """
     Parse Elementor-structured bill HTML.
-    Each bill is a text-editor widget followed by a button widget.
-    Button class tells us PBP color: danger=red, success=green, warning=orange.
+    Strategy: find all bill numbers in the page, then extract surrounding context.
+    Also reads button colors for PBP assessment.
     """
     bills = []
 
-    # Split into text-editor sections
-    # Each bill block = one elementor-widget-text-editor div
-    text_blocks = re.findall(
-        r'elementor-widget-text-editor.*?<div class="elementor-widget-container">\s*(.*?)\s*</div>\s*</div>\s*</div>',
-        html, re.DOTALL
-    )
-
-    # Also extract all button blocks with their color and href
-    button_blocks = re.findall(
-        r'elementor-button-(danger|success|warning)[^"]*"[^>]*>.*?href="([^"]+)"',
-        html, re.DOTALL
-    )
-
-    # Build a lookup: bill_number -> (pbp_color, pdf_url)
-    # from the button blocks
+    # ── Step 1: Build button map (bill number → pbp color + pdf url) ──
+    # Pattern: button color class appears near the bill text link
     bill_button_map = {}
-    for color, href in button_blocks:
-        if 'rilegislature.gov' in href:
-            # extract bill number from URL
-            m = re.search(r'/([HS]\d{4,5})\.htm', href, re.I)
-            if m:
-                num = m.group(1).upper()
-                pbp = {'danger': 'red', 'success': 'green', 'warning': 'orange'}.get(color, 'orange')
-                # Use .pdf instead of .htm
+    # Find all button widgets with their color
+    button_sections = re.findall(
+        r'(elementor-button-(?:danger|success|warning)[^"]*"[^>]*>.*?</div>\s*</div>\s*</div>\s*</div>)',
+        html, re.DOTALL
+    )
+    for sec in button_sections:
+        color_m = re.search(r'elementor-button-(danger|success|warning)', sec)
+        href_m  = re.search(r'href="([^"]*rilegislature\.gov[^"]*)"', sec)
+        if color_m and href_m:
+            href = href_m.group(1)
+            num_m = re.search(r'/([HS]\d{4,5})\.htm', href, re.I)
+            if num_m:
+                num = num_m.group(1).upper()
+                pbp = {'danger':'red','success':'green','warning':'orange'}.get(color_m.group(1),'orange')
                 pdf = href.replace('.htm', '.pdf')
                 bill_button_map[num] = (pbp, pdf)
 
-    print(f"  Found {len(text_blocks)} text blocks, {len(bill_button_map)} bill buttons")
+    print(f"  Found {len(bill_button_map)} bill buttons: {sorted(bill_button_map.keys())[:5]}...")
+
+    # ── Step 2: Extract text-editor blocks ──
+    # Each bill is in an elementor-widget-text-editor container
+    text_blocks = re.findall(
+        r'elementor-widget-text-editor[^"]*"[^>]*>.*?<div class="elementor-widget-container">\s*(.*?)\s*</div>\s*</div>\s*</div>',
+        html, re.DOTALL
+    )
+    print(f"  Found {len(text_blocks)} text editor blocks")
 
     for block in text_blocks:
-        # Try to find bill number
-        num_m = re.search(r'Bill [Nn]umber\s*:?\s*</strong>\s*([HS]\d{4,5})', block)
-        if not num_m:
-            # Try alternate format
-            num_m = re.search(r'>([HS]\d{4,5})<', block)
+        # Strip all HTML to get clean text for bill number search
+        clean = clean_html(block)
+
+        # Find bill number — look for H or S followed by 4-5 digits
+        num_m = re.search(r'\b([HS]\d{4,5})\b', clean)
         if not num_m:
             continue
-
-        num = num_m.group(1).upper().strip()
+        num = num_m.group(1).upper()
         if not re.match(r'^[HS]\d{4,5}$', num):
             continue
 
-        def extract(label):
-            # Try <strong>Label:</strong> Value pattern
-            pattern = rf'<strong[^>]*>\s*{label}\s*:?\s*</strong>\s*(.*?)(?=<strong|<p[^>]*>|$)'
-            m = re.search(pattern, block, re.DOTALL | re.IGNORECASE)
+        def extract_field(label, text):
+            """Extract field value from clean text using label as anchor."""
+            pattern = rf'{label}\s*:?\s*(.*?)(?=Bill Number|Bill number|Sponsors|Bill Title|Official Description|What Changes|Current Status|$)'
+            m = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
             if m:
-                return strip_tags(m.group(1))
-            # Try label at end of strong: <strong>Label: value</strong>
-            pattern2 = rf'<strong[^>]*>\s*{label}\s*:\s*(.*?)</strong>'
-            m2 = re.search(pattern2, block, re.DOTALL | re.IGNORECASE)
-            if m2:
-                return strip_tags(m2.group(1))
+                val = m.group(1).strip()
+                # Remove trailing field labels that got captured
+                val = re.split(r'\s+(?:Bill Number|Sponsors|Bill Title|Official Description|What Changes|Current Status)', val)[0]
+                return val.strip()
             return ""
 
-        # Extract fields
-        sponsor_raw = extract("Sponsors?")
-        # Clean up sponsor names - remove "Introduced by:" prefix
+        sponsor_raw = extract_field(r'Sponsors?', clean)
         sponsor = re.sub(r'^Introduced by:\s*', '', sponsor_raw).strip()
-        # Extract last names for letters.html
         sponsor_names = re.findall(r'(?:Rep\.|Sen\.)\s+(?:\w+\s+)?(\w+)', sponsor)
         if not sponsor_names:
-            # Try just last names after semicolons
-            sponsor_names = [n.strip().rstrip(';').rstrip(',') for n in re.split(r'[;,]', sponsor) if n.strip()]
-            sponsor_names = [n.split()[-1] for n in sponsor_names if n.split()]
+            parts = [n.strip().rstrip(';,') for n in re.split(r'[;,]', sponsor) if n.strip()]
+            sponsor_names = [p.split()[-1] for p in parts if p.split()]
 
-        title   = strip_tags(extract("Bill Title"))
-        desc    = strip_tags(extract("Official Description"))
-        changes = strip_tags(extract("What Changes"))
-        status  = strip_tags(extract("Current Status"))
+        title   = extract_field(r'Bill Title', clean)
+        desc    = extract_field(r'Official Description', clean)
+        changes = extract_field(r'What Changes', clean)
+        status  = extract_field(r'Current Status', clean)
+        status  = re.sub(r'^:\s*', '', status).strip()
 
         # Clean up status
         status = re.sub(r'^:\s*', '', status).strip()
@@ -274,7 +280,8 @@ def update_file(fname, bills, is_letters=False):
             before_script
         )
 
-    result = before_script + before_bills + bills_json + after_bills
+    # before_bills ends just before "const BILLS = [" so we must restore that prefix
+    result = before_script + before_bills + "const BILLS = " + bills_json + after_bills
     open(fname, "w").write(result)
     return True
 
