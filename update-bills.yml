@@ -2,17 +2,14 @@ name: Update RI Legislation Bills
 
 on:
   schedule:
-    # Runs every Monday at 8:00 AM UTC
     - cron: '0 8 * * 1'
   workflow_dispatch:
 
 jobs:
   update:
     runs-on: ubuntu-latest
-
     permissions:
       contents: write
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,24 +19,8 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
-        run: pip install requests --break-system-packages || pip install requests
-
-      - name: Fetch Para Bellum page via curl
-        run: |
-          curl -L \
-            -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" \
-            -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" \
-            -H "Accept-Language: en-US,en;q=0.9" \
-            -H "Cache-Control: no-cache" \
-            --compressed \
-            --max-time 30 \
-            -o /tmp/pbp_page.html \
-            "https://parabellumprovisions.com/2026-legislation/"
-          echo "Downloaded $(wc -c < /tmp/pbp_page.html) bytes"
-
       - name: Run bill updater
-        run: python update_bills.py --cached /tmp/pbp_page.html
+        run: python update_bills.py
 
       - name: Commit and push updated files
         run: |

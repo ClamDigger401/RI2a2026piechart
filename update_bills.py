@@ -14,7 +14,7 @@ import urllib.request
 from datetime import datetime, timezone
 from html.parser import HTMLParser
 
-SOURCE_URL = "https://parabellumprovisions.com/2026-legislation/"
+SOURCE_URL = "https://parabellumprovisions.org/wp-json/wp/v2/pages/36120"
 
 # ── Classification ────────────────────────────────────────────────────
 RESTRICTION_KW = [
@@ -142,43 +142,28 @@ class PBPParser(HTMLParser):
         self._save()
 
 def fetch_page(url, retries=3):
-    import gzip, zlib
+    """Fetch the WordPress REST API endpoint and return the HTML content field."""
     headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Cache-Control": "no-cache",
-        "Pragma": "no-cache",
-        "Sec-Fetch-Dest": "document",
-        "Sec-Fetch-Mode": "navigate",
-        "Sec-Fetch-Site": "none",
-        "Sec-Fetch-User": "?1",
-        "Upgrade-Insecure-Requests": "1",
+        "User-Agent": "Mozilla/5.0 (compatible; ri-legislation-tracker/2.0)",
+        "Accept": "application/json",
     }
     for attempt in range(retries):
         try:
             req = urllib.request.Request(url, headers=headers)
             with urllib.request.urlopen(req, timeout=30) as r:
-                raw = r.read()
-                enc = r.headers.get("Content-Encoding","")
-                if enc == "gzip":
-                    raw = gzip.decompress(raw)
-                elif enc in ("deflate","zlib"):
-                    raw = zlib.decompress(raw)
-                html = raw.decode("utf-8", errors="replace")
-                print(f"  Downloaded {len(html):,} bytes (encoding: {enc or 'none'})")
-                if len(html) < 1000:
-                    print(f"  WARNING: Response too small — possible bot block. Content: {html[:200]}")
-                    if attempt < retries - 1:
-                        time.sleep(5)
-                        continue
+                raw = r.read().decode("utf-8", errors="replace")
+                data = json.loads(raw)
+                # Extract rendered HTML content from WordPress API response
+                html = data.get("content", {}).get("rendered", "")
+                if not html:
+                    raise RuntimeError("No content.rendered field in API response")
+                print(f"  Downloaded {len(html):,} bytes from WordPress API")
                 return html
         except Exception as e:
             print(f"  Attempt {attempt+1} failed: {e}")
             if attempt < retries - 1:
-                time.sleep(5)
-    raise RuntimeError(f"Failed to fetch {url} after {retries} attempts")
+                time.sleep(3)
+    raise RuntimeError(f"Failed to fetch WordPress API at {url}")
 
 def regex_fallback(html):
     clean = re.sub(r"<[^>]+>"," ",html)
@@ -313,28 +298,12 @@ def generate_letters(bills, before_script, before_bills, after_bills):
 
 # ── Main ──────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    import sys
-    cached_file = None
-    if "--cached" in sys.argv:
-        idx = sys.argv.index("--cached")
-        if idx + 1 < len(sys.argv):
-            cached_file = sys.argv[idx + 1]
-
-    if cached_file:
-        print(f"Using cached page: {cached_file}")
-        try:
-            html = open(cached_file, "r", encoding="utf-8", errors="replace").read()
-            print(f"  Read {len(html):,} bytes from cache")
-        except Exception as e:
-            print(f"ERROR reading cached file: {e}")
-            raise SystemExit(1)
-    else:
-        print(f"Fetching {SOURCE_URL} ...")
-        try:
-            html = fetch_page(SOURCE_URL)
-        except RuntimeError as e:
-            print(f"ERROR: {e}")
-            raise SystemExit(1)
+    print(f"Fetching WordPress API: {SOURCE_URL} ...")
+    try:
+        html = fetch_page(SOURCE_URL)
+    except RuntimeError as e:
+        print(f"ERROR: {e}")
+        raise SystemExit(1)
 
     print("Parsing bills from Para Bellum Provisions...")
     bills = scrape_bills(html)
