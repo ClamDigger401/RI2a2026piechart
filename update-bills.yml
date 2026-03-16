@@ -1,4 +1,4 @@
-name: Update RI Firearms Bills
+name: Update RI Legislation Bills
 
 on:
   schedule:
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write  # needed to commit index.html back to repo
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -24,14 +24,12 @@ jobs:
           python-version: '3.11'
 
       - name: Run bill updater
-        env:
-          LEGISCAN_API_KEY: ${{ secrets.LEGISCAN_API_KEY }}
         run: python update_bills.py
 
-      - name: Commit and push updated index.html
+      - name: Commit and push updated files
         run: |
           git config user.name "anonymous"
           git config user.email "anonymous@example.com"
-          git add index.html
-          git diff --staged --quiet || git commit -m "Auto-update: RI firearms bills $(date -u '+%Y-%m-%d')"
+          git add index.html letters.html
+          git diff --staged --quiet || git commit -m "Auto-update: RI legislation bills $(date -u '+%Y-%m-%d')"
           git push
