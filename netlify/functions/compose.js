@@ -1,64 +1,11 @@
 /**
  * netlify/functions/compose.js
- * Proxy for letter composition — tries Anthropic first, falls back to Groq.
- * Set ANTHROPIC_API_KEY and GROQ_API_KEY in Netlify Environment Variables.
- * Groq free tier: https://console.groq.com (no credit card needed)
+ * Uses Groq API exclusively for letter composition.
+ * Free tier at console.groq.com — no credit card needed.
+ * Set GROQ_API_KEY in Netlify Environment Variables.
  */
 
 const https = require("https");
-
-function httpsPost(hostname, path, headers, body) {
-  return new Promise((resolve, reject) => {
-    const req = https.request({ hostname, path, method: "POST", headers }, (res) => {
-      let data = "";
-      res.on("data", (chunk) => { data += chunk; });
-      res.on("end", () => resolve({ status: res.statusCode, body: data }));
-    });
-    req.on("error", reject);
-    req.write(body);
-    req.end();
-  });
-}
-
-async function tryAnthropic(key, messages) {
-  const payload = JSON.stringify({
-    model: "claude-opus-4-5",
-    max_tokens: 1200,
-    messages,
-  });
-  const res = await httpsPost("api.anthropic.com", "/v1/messages", {
-    "Content-Type": "application/json",
-    "x-api-key": key,
-    "anthropic-version": "2023-06-01",
-    "Content-Length": Buffer.byteLength(payload),
-  }, payload);
-  const data = JSON.parse(res.body);
-  if (res.status !== 200) {
-    throw new Error(data?.error?.message || JSON.stringify(data));
-  }
-  // Return in standard format
-  const text = data.content?.find(b => b.type === "text")?.text || "";
-  return { text };
-}
-
-async function tryGroq(key, messages) {
-  const payload = JSON.stringify({
-    model: "llama-3.3-70b-versatile",
-    max_tokens: 1200,
-    messages,
-  });
-  const res = await httpsPost("api.groq.com", "/openai/v1/chat/completions", {
-    "Content-Type": "application/json",
-    "Authorization": `Bearer ${key}`,
-    "Content-Length": Buffer.byteLength(payload),
-  }, payload);
-  const data = JSON.parse(res.body);
-  if (res.status !== 200) {
-    throw new Error(data?.error?.message || JSON.stringify(data));
-  }
-  const text = data.choices?.[0]?.message?.content || "";
-  return { text };
-}
 
 exports.handler = async (event) => {
   const corsHeaders = {
@@ -70,6 +17,15 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
+  const GROQ_KEY = process.env.GROQ_API_KEY;
+  if (!GROQ_KEY) {
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: "GROQ_API_KEY not configured in Netlify environment variables" }),
+    };
+  }
+
   let body;
   try {
     body = JSON.parse(event.body);
@@ -77,45 +33,60 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: "Invalid JSON" }) };
   }
 
-  const messages = body.messages;
-  const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
-  const GROQ_KEY = process.env.GROQ_API_KEY;
+  const payload = JSON.stringify({
+    model: "llama-3.3-70b-versatile",
+    max_tokens: 1200,
+    messages: body.messages,
+  });
 
-  // Try Anthropic first
-  if (ANTHROPIC_KEY) {
-    try {
-      const result = await tryAnthropic(ANTHROPIC_KEY, messages);
-      return {
-        statusCode: 200,
-        headers: corsHeaders,
-        body: JSON.stringify({ content: [{ type: "text", text: result.text }] }),
-      };
-    } catch (e) {
-      console.log("Anthropic failed:", e.message, "— trying Groq fallback");
-    }
-  }
-
-  // Fall back to Groq
-  if (GROQ_KEY) {
-    try {
-      const result = await tryGroq(GROQ_KEY, messages);
-      return {
-        statusCode: 200,
-        headers: corsHeaders,
-        body: JSON.stringify({ content: [{ type: "text", text: result.text }] }),
-      };
-    } catch (e) {
-      return {
+  return new Promise((resolve) => {
+    const req = https.request({
+      hostname: "api.groq.com",
+      path: "/openai/v1/chat/completions",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${GROQ_KEY}`,
+        "Content-Length": Buffer.byteLength(payload),
+      },
+    }, (res) => {
+      let data = "";
+      res.on("data", (chunk) => { data += chunk; });
+      res.on("end", () => {
+        try {
+          const parsed = JSON.parse(data);
+          if (res.statusCode !== 200) {
+            resolve({
+              statusCode: res.statusCode,
+              headers: corsHeaders,
+              body: JSON.stringify({ error: parsed?.error?.message || JSON.stringify(parsed) }),
+            });
+            return;
+          }
+          const text = parsed.choices?.[0]?.message?.content || "";
+          // Return in Anthropic-compatible format so letters.html works unchanged
+          resolve({
+            statusCode: 200,
+            headers: corsHeaders,
+            body: JSON.stringify({ content: [{ type: "text", text }] }),
+          });
+        } catch (e) {
+          resolve({
+            statusCode: 500,
+            headers: corsHeaders,
+            body: JSON.stringify({ error: `Parse error: ${e.message}` }),
+          });
+        }
+      });
+    });
+    req.on("error", (e) => {
+      resolve({
         statusCode: 500,
         headers: corsHeaders,
-        body: JSON.stringify({ error: `Groq error: ${e.message}` }),
-      };
-    }
-  }
-
-  return {
-    statusCode: 500,
-    headers: corsHeaders,
-    body: JSON.stringify({ error: "No API keys configured. Set ANTHROPIC_API_KEY or GROQ_API_KEY in Netlify environment variables." }),
-  };
+        body: JSON.stringify({ error: e.message }),
+      });
+    });
+    req.write(payload);
+    req.end();
+  });
 };
