@@ -30,6 +30,25 @@ EXPANSION_KW = [
     "electronic dart gun.*purchase",
 ]
 
+# ── Para Bellum confirmed color overrides ────────────────────────────
+# These override scraper-inferred colors with verified PBP assessments
+PBP_OVERRIDES = {
+    # RED — Para Bellum opposes
+    "H7035":"red","H7128":"red","H7133":"red","H7557":"red","H7755":"red",
+    "H8067":"red","H8068":"red","H8069":"red","H8070":"red","H8071":"red",
+    "H8073":"red","H8075":"red","S2053":"red","S2056":"red","S2144":"red",
+    "S2155":"red","S2283":"red","S2285":"red","S2295":"red","S2314":"red",
+    "S2395":"red","S2611":"red","S2710":"red","S2958":"red","S2971":"red",
+    "S3038":"red","S3110":"red",
+    # GREEN — Para Bellum supports
+    "S2726":"green","S2306":"green","S2292":"green","S2277":"green",
+    "S2164":"green","S2163":"green","S2153":"green","S2086":"green",
+    "H8072":"green","H7754":"green","H7753":"green","H7650":"green",
+    "H7636":"green","H7593":"green","H7553":"green",
+    # ORANGE — Para Bellum neutral
+    "H7145":"orange","H7546":"orange",
+}
+
 def classify(title, desc, changes=""):
     text = (title + " " + desc + " " + changes).lower()
     r = sum(1 for kw in RESTRICTION_KW if re.search(kw, text))
@@ -147,6 +166,10 @@ def parse_elementor_bills(html):
                 pdf_url = f"https://webserver.rilegislature.gov/BillText{yr}/SenateText{yr}/{num}.pdf"
             else:
                 pdf_url = f"https://webserver.rilegislature.gov/BillText{yr}/HouseText{yr}/{num}.pdf"
+
+        # Apply verified PBP color overrides
+        if num in PBP_OVERRIDES:
+            pbp_color = PBP_OVERRIDES[num]
 
         def extract_field(label, text):
             """Extract field value from clean text using label as anchor."""
@@ -322,11 +345,8 @@ if __name__ == "__main__":
     else:
         print("  ✗ index.html update FAILED")
 
-    print("Updating letters.html...")
-    if update_file("letters.html", bills, is_letters=True):
-        print("  ✓ letters.html updated")
-    else:
-        print("  ✗ letters.html update FAILED")
+    # letters.html uses manually verified PBP colors — do not auto-update
+    print("Skipping letters.html — colors are manually maintained for accuracy")
 
     print(f"\nDone — {len(bills)} bills written")
     print(f"New bills detected: {', '.join(b['num'] for b in bills)}")
