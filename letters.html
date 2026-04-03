@@ -746,6 +746,11 @@ async function generateLetters(mode) {
       }
     });
 
+    // Small delay between requests to avoid Groq rate limit (12k tokens/min)
+    if (Object.keys(generatedLetters).length > 0) {
+      await new Promise(r => setTimeout(r, 4000)); // 4 second pause between letters
+    }
+
     try {
       const letterText = await generateOneLetter(firstName, lastName, town, bill, stance, allRecipients, userLegislators);
       generatedLetters[billNum] = { recipients: allRecipients, text: letterText };
@@ -773,9 +778,11 @@ async function generateLetters(mode) {
 }
 
 async function generateOneLetter(firstName, lastName, town, bill, stance, recipients, myLegislators) {
-  // Salutation uses the constituent's own rep/senator — personal and direct
-  const myRep = myLegislators && myLegislators.length > 0 ? myLegislators[0] : null;
-  const mySen = myLegislators && myLegislators.length > 1 ? myLegislators[1] : null;
+  // Salutation uses the constituent's ZIP-based rep/senator — personal and direct
+  // userLegislators is the global array populated by Find My Legislators
+  const myLegs = (myLegislators && myLegislators.length > 0) ? myLegislators : userLegislators;
+  const myRep = myLegs.length > 0 ? myLegs[0] : null;
+  const mySen = myLegs.length > 1 ? myLegs[1] : null;
 
   let salutation, salutationLine;
   if (myRep && mySen) {
