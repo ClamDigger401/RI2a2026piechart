@@ -83,46 +83,43 @@ def clean_html(html):
 def parse_elementor_bills(html):
     """
     Parse Elementor-structured bill HTML.
-    Strategy: find all bill numbers in the page, then extract surrounding context.
-    Also reads button colors for PBP assessment.
+    Match each text-editor block with the button that immediately follows it
+    (positional matching) — not by PDF URL, which can be wrong on the source site.
     """
     bills = []
 
-    # ── Step 1: Build button map (bill number → pbp color + pdf url) ──
-    # Pattern: button color class appears near the bill text link
-    bill_button_map = {}
-    # Find all button widgets with their color
-    button_sections = re.findall(
-        r'(elementor-button-(?:danger|success|warning)[^"]*"[^>]*>.*?</div>\s*</div>\s*</div>\s*</div>)',
-        html, re.DOTALL
+    # Split HTML into ordered chunks: text-editor blocks and button blocks
+    # We process them in order so each bill gets the button that follows it
+    chunks = re.split(
+        r'(<div[^>]*elementor-widget-(?:text-editor|button)[^>]*>)',
+        html
     )
-    for sec in button_sections:
-        color_m = re.search(r'elementor-button-(danger|success|warning)', sec)
-        href_m  = re.search(r'href="([^"]*rilegislature\.gov[^"]*)"', sec)
-        if color_m and href_m:
-            href = href_m.group(1)
-            num_m = re.search(r'/([HS]\d{4,5})\.htm', href, re.I)
-            if num_m:
-                num = num_m.group(1).upper()
-                pbp = {'danger':'red','success':'green','warning':'orange'}.get(color_m.group(1),'orange')
-                pdf = href.replace('.htm', '.pdf')
-                bill_button_map[num] = (pbp, pdf)
 
-    print(f"  Found {len(bill_button_map)} bill buttons: {sorted(bill_button_map.keys())[:5]}...")
+    # Build ordered list of (type, content) pairs
+    ordered = []
+    i = 0
+    while i < len(chunks):
+        chunk = chunks[i]
+        if 'elementor-widget-text-editor' in chunk:
+            # Grab the content that follows this opening tag
+            content_chunk = chunks[i+1] if i+1 < len(chunks) else ""
+            ordered.append(('text', chunk + content_chunk))
+            i += 2
+        elif 'elementor-widget-button' in chunk:
+            content_chunk = chunks[i+1] if i+1 < len(chunks) else ""
+            ordered.append(('button', chunk + content_chunk))
+            i += 2
+        else:
+            i += 1
 
-    # ── Step 2: Extract text-editor blocks ──
-    # Each bill is in an elementor-widget-text-editor container
-    text_blocks = re.findall(
-        r'elementor-widget-text-editor[^"]*"[^>]*>.*?<div class="elementor-widget-container">\s*(.*?)\s*</div>\s*</div>\s*</div>',
-        html, re.DOTALL
-    )
-    print(f"  Found {len(text_blocks)} text editor blocks")
+    print(f"  Found {sum(1 for t,_ in ordered if t=='text')} text blocks, {sum(1 for t,_ in ordered if t=='button')} button blocks")
 
-    for block in text_blocks:
-        # Strip all HTML to get clean text for bill number search
+    # Now process: for each text block, find the next button block
+    for idx, (typ, block) in enumerate(ordered):
+        if typ != 'text':
+            continue
+
         clean = clean_html(block)
-
-        # Find bill number — look for H or S followed by 4-5 digits
         num_m = re.search(r'\b([HS]\d{4,5})\b', clean)
         if not num_m:
             continue
@@ -130,13 +127,33 @@ def parse_elementor_bills(html):
         if not re.match(r'^[HS]\d{4,5}$', num):
             continue
 
+        # Find the next button block after this text block
+        pbp_color = 'orange'
+        pdf_url = ''
+        for j in range(idx+1, min(idx+4, len(ordered))):
+            next_typ, next_block = ordered[j]
+            if next_typ == 'button':
+                color_m = re.search(r'elementor-button-(danger|success|warning)', next_block)
+                href_m  = re.search(r'href="([^"]*rilegislature\.gov[^"]*)"', next_block)
+                if color_m:
+                    pbp_color = {'danger':'red','success':'green','warning':'orange'}.get(color_m.group(1), 'orange')
+                if href_m:
+                    pdf_url = href_m.group(1).replace('.htm', '.pdf')
+                break
+
+        if not pdf_url:
+            yr = "26"
+            if num.startswith('S'):
+                pdf_url = f"https://webserver.rilegislature.gov/BillText{yr}/SenateText{yr}/{num}.pdf"
+            else:
+                pdf_url = f"https://webserver.rilegislature.gov/BillText{yr}/HouseText{yr}/{num}.pdf"
+
         def extract_field(label, text):
             """Extract field value from clean text using label as anchor."""
             pattern = rf'{label}\s*:?\s*(.*?)(?=Bill Number|Bill number|Sponsors|Bill Title|Official Description|What Changes|Current Status|$)'
             m = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
             if m:
                 val = m.group(1).strip()
-                # Remove trailing field labels that got captured
                 val = re.split(r'\s+(?:Bill Number|Sponsors|Bill Title|Official Description|What Changes|Current Status)', val)[0]
                 return val.strip()
             return ""
@@ -153,19 +170,7 @@ def parse_elementor_bills(html):
         changes = extract_field(r'What Changes', clean)
         status  = extract_field(r'Current Status', clean)
         status  = re.sub(r'^:\s*', '', status).strip()
-
-        # Clean up status
-        status = re.sub(r'^:\s*', '', status).strip()
-
-        # Get PBP color and PDF URL from button map
-        pbp_color, pdf_url = bill_button_map.get(num, ('orange', ''))
-        if not pdf_url:
-            # Infer PDF URL
-            yr = "26"
-            if num.startswith('S'):
-                pdf_url = f"https://webserver.rilegislature.gov/BillText{yr}/SenateText{yr}/{num}.pdf"
-            else:
-                pdf_url = f"https://webserver.rilegislature.gov/BillText{yr}/HouseText{yr}/{num}.pdf"
+        # pbp_color and pdf_url already set from positional button matching above
 
         btype = classify(title, desc, changes)
         chamber = "Senate" if num.startswith("S") else "House"
